@@ -1,0 +1,17 @@
+EXPORTS
+    Load = Load
+    Dispose = Dispose
+    DoorClose = DoorClose
+    DoorOpen = DoorOpen
+    Elapse = Elapse
+    GetPluginVersion = GetPluginVersion
+    HornBlow = HornBlow
+    Initialize = Initialize
+    KeyDown = KeyDown
+    KeyUp = KeyUp
+    SetBeaconData = SetBeaconData
+    SetBrake = SetBrake
+    SetPower = SetPower
+    SetReverser = SetReverser
+    SetSignal = SetSignal
+    SetVehicleSpec = SetVehicleSpec
