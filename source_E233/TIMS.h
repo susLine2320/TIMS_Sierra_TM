@@ -13,6 +13,7 @@ int ini_UseJRTIMS; //JRTIMS使用可否
 int ini_UseUnit; //ユニット灯使用可否
 int ini_UseDistance; //走行距離使用可否
 int ini_Line; //系統（5：東西、7：南北、9：千代田、13：副都心）
+int ini_Ammeter; //電流計仕様
 
 TIMS_new_TMIni ini;
 
@@ -180,11 +181,14 @@ public:
 	int MrPress7; // 元空気ダメ指針(int型)
 
 	int Ammeter0; // 電流計
+	int Ammeter5; // 電流計
 	int Ammeter1; // 電流計1000位
 	int Ammeter2; // 電流計100位
 	int Ammeter3; // 電流計10位
 	int Ammeter4; // 電流計1位
 	int AmmeterC; // 電流計符号
+	int AmmeterD1; //電流メータ+
+	int AmmeterD2; //電流メータ-
 
 	int AccelCutting; // 力行遅延(この時刻まで反映しない)
 
@@ -318,6 +322,7 @@ public:
 		MrPress7 = 0; // 元空気ダメ指針(int)
 
 		Ammeter0 = 0; // 電流計
+		Ammeter5 = 0; // 電流計
 
 		Ammeter1 = 0; // 電流計1000位
 		Ammeter2 = 0; // 電流計100位
@@ -995,6 +1000,7 @@ public:
 			//桁表示ここまで
 
 			Ammeter0 = fabs(Current); // 電流計
+			Ammeter5 = Current;
 
 			Ammeter1 = fabs(Current) / 1000;
 			Ammeter2 = (fabs(Current) / 100) - (Ammeter1 * 10);
@@ -1007,6 +1013,12 @@ public:
 
 			if(Current >= 0){AmmeterC = 10;}
 			if(Current < 0){AmmeterC = 12;}
+
+			AmmeterD1 = 0;
+			AmmeterD2 = 0;
+
+			if (Current > 0) { AmmeterD1 = Current / 50; } // 電流メータ+
+			if (Current < 0) { AmmeterD2 = Current / 50 * (-1); } //電流メータ-
 
 			m_tmrUpdate = 200 + (*Time % 50) * 5;
 		}
@@ -2028,11 +2040,25 @@ public:
 	// 出力
 	int Cooler; // 冷房
 	int CoolerSound; // 冷房音
+	int year_disp;
+	int month_disp;
+	int date_disp;
+	int yobi_disp;
+	int yobi_set; //曜日設定
+	int pastyobi;
 
 	// 初期化する
 	void initialize(void)
 	{
 		m_month = 0; // 月
+		m_date = 0;
+		m_year = 0;
+		m_yobi = 0;
+		yobi_set = 0; //地上子曜日設定
+		year_disp = 0;
+		month_disp = 0;
+		date_disp = 0;
+		yobi_disp = 0;
 
 		Cooler = 0; // 冷房
 		CoolerSound = ATS_SOUND_STOP; // 冷房音
@@ -2046,14 +2072,111 @@ public:
 		time(&t);
 		status = localtime(&t);
 		m_month = status->tm_mon + 1;
+		m_date = status->tm_mday;
+		m_year = status->tm_year + 1900;
+		m_yobi = status->tm_wday + 1;
 
 		// 冷房の制御
 		if(Cooler == 0)
 		{
 			Cooler = (m_month >= 6 && m_month <= 9);
 		}
+
+		if (yobi_set > 0) {
+			setdate(yobi_set);
+		}
+		else {
+			year_disp = m_year;
+			month_disp = m_month;
+			date_disp = m_date;
+			yobi_disp = m_yobi;
+		}
 	}
 
+	void SetYobi(int yobi)//曜日設定地上子で設定
+	{
+		yobi_set = yobi;//10以上が設定年号、1の位が設定曜日（1～7）
+	}
+
+	void setdate(int yobi) {
+		if (yobi >= 10) {//曜日が10以上→年指定
+			year_disp = yobi / 10; //年は設定した年数
+		}
+		else {//曜日が9以下→年は今の年
+			year_disp = m_year;
+		}
+			month_disp = m_month; //月は一切変動しない
+			yobi_disp = yobi % 10;
+			if (year_disp % 4 != 0 && m_month == 2 && m_date == 29)//うるう年でない29日は28日扱い
+			{
+				m_date = 28;
+			}
+
+			// month が 1 または 2 である場合は微調整をします。
+			if (m_month == 1 || m_month == 2)
+			{
+				// １月は前年の１３月、２月は前年の１４月とします。
+				year_disp--;
+				m_month += 12;
+			}
+			// 地球の公転周期の有理数近似 365 + 1/4 - 1/100 + 1/400 とあわせて、また、小数点演算を整数かすることで 30 日と 31 日の誤差を吸収するらしいです。
+			// 年を上位 (yH) と下位 (yL) とに分離します。
+
+			int yH = int(year_disp / 100);
+			int yL = year_disp - (yH * 100);
+
+			// Zeller の公式を用いて week を計算します。
+			int week = (yH >> 2) - 2 * yH + (yL >> 2) + yL + int((m_month + 1) * 2.6) + m_date;
+			pastyobi = (week % 7); //過去の今日の曜日
+
+			year_disp++;
+
+			if (pastyobi != yobi % 10)//設定する曜日と違っているなら
+			{
+					date_disp= m_date + (yobi % 10 - pastyobi - 7);//過去の曜日=2/設定曜日=3なら1日進める
+					if (date_disp < 1)//1切ったら7日繰り上げ
+					{
+						date_disp = date_disp + 7;
+						if (date_disp < 1)//1切ったら7日繰り上げ
+						{
+							date_disp = date_disp + 7;
+						}
+					}
+			}
+			else {
+				date_disp = m_date;
+			}
+	}
+/*
+	void set(void) {
+		//year_disp = m_year % 100;
+
+	}
+
+	//過去の今日の曜日を取得
+int zeller(int year, int month, int day)
+	{
+		// month が 1 または 2 である場合は微調整をします。
+		if (month == 1 || month == 2)
+		{
+			// １月は前年の１３月、２月は前年の１４月とします。
+			year--;
+			month += 12;
+		}
+		// 地球の公転周期の有理数近似 365 + 1/4 - 1/100 + 1/400 とあわせて、また、小数点演算を整数かすることで 30 日と 31 日の誤差を吸収するらしいです。
+		// 年を上位 (yH) と下位 (yL) とに分離します。
+
+		int yH = int(year / 100);
+		int yL = year - (yH * 100);
+
+		// Zeller の公式を用いて week を計算します。
+		int week = (yH >> 2) - 2 * yH + (yL >> 2) + yL + int((month + 1) * 2.6) + day;
+		pastyobi =  (week % 7) + 1; //過去の今日の曜日
+	}
+*/
 private:
 	int m_month; // 月(1～12)
+	int m_date; // 日（1～31）
+	int m_year; // 年（1～12）
+	int m_yobi; //曜日（日～土）
 };	// CDate

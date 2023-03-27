@@ -1,5 +1,5 @@
 //
-// Generated on 2023/02/15 by inimoni 
+// Generated on 2023/03/27 by inimoni 
 //
 
 /*
@@ -116,9 +116,15 @@ public:
     {
         int      UseJRTIMS;               //JR用TIMSの使用可否（0不使用、1使用、2JR線内のみ使用）
         int      UseUnit;                 //ユニット灯使用（小田急PIあれば不要）
-        int      Line;                    //路線系統（9号、5号、13号）
         int      UseDistance;             //走行距離使用可否
+        int      Line;                    //路線系統（9号、5号、13号）
+        int      Ammeter;                 //電流計仕様（1で片振り）
     } Disp;
+
+    // Meter
+    struct _Meter
+    {
+    } Meter;
 
 protected:
 
@@ -136,18 +142,23 @@ protected:
         s = _T("Disp");
         inimoni::inirw(r, f, s, _T("UseJRTIMS        "), Disp.UseJRTIMS);
         inimoni::inirw(r, f, s, _T("UseUnit          "), Disp.UseUnit);
+        inimoni::inirw(r, f, s, _T("UseDistance      "), Disp.UseDistance);
         inimoni::inirw(r, f, s, _T("Line             "), Disp.Line);
+        inimoni::inirw(r, f, s, _T("Ammeter          "), Disp.Ammeter);
+
+        s = _T("Meter");
         return true;
     }
 
     void init()
     {
         Emulate.ebCutPressure = 1000;
-        Emulate.lbInit = 1;
+        Emulate.lbInit = 0;
         Disp.UseJRTIMS = 0;
         Disp.UseUnit = 0;
         Disp.UseDistance = 1;
         Disp.Line = 9;
+        Disp.Ammeter = 0;
     }
 };
 typedef TIMS_new_TMIni TIMS_new_TMFile; //新旧互換

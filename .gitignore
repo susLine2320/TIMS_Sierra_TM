@@ -1,0 +1,18 @@
+# 特定拡張子での除外
+*.exp
+*.lib
+*.pch
+*.pdb
+*.res
+*.obj
+*.recipe
+*.log
+
+# 特定ファイルでの除外
+TIMS_new_TM.tlog/
+Ats.vcxproj.FileListAbsolute.txt
+209-1000/
+x64/
+x86/
+.vs/
+TIMS_new_9N.dll

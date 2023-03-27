@@ -109,6 +109,7 @@ ATS_API void WINAPI Initialize(int brake)
 	ini_UseUnit = ini.Disp.UseUnit; //ユニット灯使用可否
 	ini_UseDistance = ini.Disp.UseDistance; //走行距離使用可否
 	ini_Line = ini.Disp.Line; //路線定義
+	ini_Ammeter = ini.Disp.Ammeter; //電流計仕様
 
 	g_speed = 0;
 	g_tims.initialize();
@@ -161,12 +162,18 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	g_output.ConstantSpeed = ATS_CONSTANTSPEED_CONTINUE;
 
 	// パネル出力
-	//panel[226] = g_tims.AmmeterC; // 電流計[符号]
-	//panel[227] = g_tims.Ammeter1; // 電流計[1000位]
-	//panel[228] = g_tims.Ammeter2; // 電流計[100位]
-	//panel[229] = g_tims.Ammeter3; // 電流計[10位]
-	//panel[230] = g_tims.Ammeter4; // 電流計[1位]
+	/*
+	panel[226] = g_tims.AmmeterC; // 電流計[符号]
+	panel[227] = g_tims.Ammeter1; // 電流計[1000位]
+	panel[228] = g_tims.Ammeter2; // 電流計[100位]
+	panel[229] = g_tims.Ammeter3; // 電流計[10位]
+	panel[230] = g_tims.Ammeter4; // 電流計[1位]
 	panel[252] = g_tims.Ammeter0; // 電流計[A]
+	panel[300] = g_tims.Ammeter5;
+	*/
+	panel[149] = g_tims.AmmeterD1;
+	panel[150] = g_tims.AmmeterD2;
+	panel[252] = ini_Ammeter == 1 ? g_tims.Ammeter0 : g_tims.Ammeter5;
 
 	// panel[29] = g_sub.Key; // マスコンキー
 	panel[30] = g_tims.AccelDelay; // 力行表示
@@ -424,6 +431,14 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 //そのほか機能
 
 	// panel[212] = g_date.Cooler; // 冷房状態
+/*
+	panel[255] = g_date.year_disp;
+	panel[256] = g_date.month_disp;
+	panel[257] = g_date.date_disp;
+	panel[258] = g_date.yobi_disp;
+*/
+
+	
 
 
 /* >>EXPORT
@@ -669,7 +684,12 @@ ATS_API void WINAPI SetBeaconData(ATS_BEACONDATA beaconData)
 	case 603: //駅名強制割込み
 		g_tims.SetSEStaExtra(beaconData.Optional);
 		break;
-	case 604: //
+	case 604: //TIS駅名読み込み
+		g_tims.SetSESta(beaconData.Optional);
+		break;
+	case 607: //曜日設定
+		g_date.SetYobi(beaconData.Optional);
+		break;
 	/*
 	case ATS_BEACON_UPD: // TIMS更新宣言
 		g_tims.UpdateView();

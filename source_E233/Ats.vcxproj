@@ -183,9 +183,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="atsplugin.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TIMS.h" />
     <ClInclude Include="TIMSini.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
