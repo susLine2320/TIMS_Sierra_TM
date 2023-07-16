@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ats", "source/Ats.vcxproj", "{E3FF2490-DD6B-4985-8ECB-2E57BB31B19B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ats", "source_E233/Ats.vcxproj", "{E3FF2490-DD6B-4985-8ECB-2E57BB31B19B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
