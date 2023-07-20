@@ -68,15 +68,15 @@ BVE Trainsim 6 + Windows10での動作を確認していますが、恐らくBve
 
 | Section |Key|設定値|既定値|説明|
 | :---: | :---: | :---: | ---: | :---: |
-|Emulate|ebCutPressure|減圧時間[ms]|1000|ブレーキ減圧時間
-|Emulate|lbInit|使用1、不使用0|1|初回起動時力行遅延
-Disp|useLegacyDisp|各路線モード使用'0'、**TIMS_new_9.dll**互換'1"、**TIMS_new_E.dll**互換'2'|0|互換モード
-Disp|UnitDispEnable|TIMSユニット表示灯1、ユニット表示灯2、不使用0|0|ユニット灯使用可否
-Disp|EnableMeterDisp|使用1|1|メーター表示器使用可否
-Disp|EnableVmeter|使用1|1|電圧関連の表示可否
-Disp|EnableTIMSDisp|使用1|1|TIMS行路表の表示可否
-Disp|AMType|片振り1、両振り0|0|電流計仕様
-Disp|DispType|東西5、南北7、千代田9、副都心13|9|使用路線
+|Emulate|ebCutPressure|減圧時間[ms]|`1000`|ブレーキ減圧時間
+|Emulate|lbInit|使用`1`、不使用`0`|`1`|初回起動時力行遅延
+Disp|useLegacyDisp|各路線モード使用`0`、**TIMS_new_9.dll**互換`1`、**TIMS_new_E.dll**互換`2`|`0`|互換モード
+Disp|UnitDispEnable|TIMSユニット表示灯`1`、ユニット表示灯`2`、不使用`0`|`0`|ユニット灯使用可否
+Disp|EnableMeterDisp|使用`1`|`1`|メーター表示器使用可否
+Disp|EnableVmeter|使用`1`|`1`|電圧関連の表示可否
+Disp|EnableTIMSDisp|使用`1`|`1`|TIMS行路表の表示可否
+Disp|AMType|片振り`1`、両振り`0`|`0`|電流計仕様
+Disp|DispType|東西`5`、南北`7`、千代田`9`、副都心`13`|`9`|使用路線
 
 そのほか、TIMS_sierraにある設定項目は大体使えます。詳しくはwikiを参照ください。
 
