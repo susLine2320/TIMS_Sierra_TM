@@ -181,33 +181,33 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 				panel[48] = g_meter.MRPress; //元空気ダメ[指針]
 			}
 			// 速度計
-			panel[17] = g_meter.SpeedD[0]; //速度計[100位]
-			panel[18] = g_meter.SpeedD[1]; //速度計[10位]
-			panel[20] = g_meter.SpeedD[2]; //速度計[1位]
-			panel[21] = g_meter.Speed; //速度計[指針]
+			//panel[17] = g_meter.SpeedD[0]; //速度計[100位]
+			//panel[18] = g_meter.SpeedD[1]; //速度計[10位]
+			//panel[20] = g_meter.SpeedD[2]; //速度計[1位]
+			//panel[21] = g_meter.Speed; //速度計[指針]
 			// ブレーキ指令計
-			panel[30] = g_meter.AccelDelay; //力行指令
-			panel[41] = g_meter.BrakeDelay; //ブレーキ指令
+			//panel[30] = g_meter.AccelDelay; //力行指令
+			//panel[41] = g_meter.BrakeDelay; //ブレーキ指令
 			panel[42] = g_meter.BrakeDelay == g_emgBrake ? 1 : 0; //非常ブレーキ
 		}
 		if (EVmeter != 0) //電圧を出力
 		{
 			//電圧類
 			//panel[217] = g_dead.AC; //交流
-			panel[25] = g_dead.DC; //直流
-			panel[28] = g_dead.CVacc; //制御電圧異常
-			panel[78] = g_dead.CVacc10; //制御電圧[10位]
-			panel[79] = g_dead.CVacc1; //制御電圧[1位]
+			panel[17] = g_dead.DC; //直流
+			//panel[28] = g_dead.CVacc; //制御電圧異常
+			//panel[78] = g_dead.CVacc10; //制御電圧[10位]
+			//panel[79] = g_dead.CVacc1; //制御電圧[1位]
 			/*
 			panel[222] = g_dead.ACacc; //交流電圧異常
 			panel[223] = g_dead.ACacc10000; //交流電圧[10000位]
 			panel[224] = g_dead.ACacc1000; //交流電圧[1000位]
 			panel[225] = g_dead.ACacc100; //交流電圧[100位]
 			*/
-			panel[26] = g_dead.DCacc; //直流電圧異常
-			panel[32] = g_dead.DCacc1000; //直流電圧[1000位]
-			panel[33] = g_dead.DCacc100; //直流電圧[100位]
-			panel[34] = g_dead.DCacc10; //直流電圧[10位]
+			//panel[26] = g_dead.DCacc; //直流電圧異常
+			//panel[32] = g_dead.DCacc1000; //直流電圧[1000位]
+			//panel[33] = g_dead.DCacc100; //直流電圧[100位]
+			//panel[34] = g_dead.DCacc10; //直流電圧[10位]
 			panel[253] = g_dead.Cvmeter; //制御指針
 			//panel[231] = g_dead.Acmeter; //交流指針
 			panel[254] = g_dead.Dcmeter; //直流指針
@@ -279,19 +279,19 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 
 			panel[147] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[0] ? 0 : g_tims.Arrive[0][0]; //到着時刻1H
 			panel[4] = DispType != 5 && g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[0] ? 0 : g_tims.Arrive[0][1]; //到着時刻1M
-			panel[51] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[0] ? 0 : g_tims.Arrive[0][2]; //到着時刻1S
+			panel[87] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[0] ? 0 : g_tims.Arrive[0][2]; //到着時刻1S
 			panel[148] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[1] ? 0 : g_tims.Arrive[1][0]; //到着時刻2H
 			panel[10] = DispType != 5 && g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[1] ? 0 : g_tims.Arrive[1][1]; //到着時刻2M
-			panel[52] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[1] ? 0 : g_tims.Arrive[1][2]; //到着時刻2S
+			panel[88] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[1] ? 0 : g_tims.Arrive[1][2]; //到着時刻2S
 			panel[158] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[2] ? 0 : g_tims.Arrive[2][0]; //到着時刻3H
 			panel[11] = DispType != 5 && g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[2] ? 0 : g_tims.Arrive[2][1]; //到着時刻3M
-			panel[53] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[2] ? 0 : g_tims.Arrive[2][2]; //到着時刻3S
+			panel[89] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[2] ? 0 : g_tims.Arrive[2][2]; //到着時刻3S
 			panel[159] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[3] ? 0 : g_tims.Arrive[3][0]; //到着時刻4H
 			panel[12] = DispType != 5 && g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[3] ? 0 : g_tims.Arrive[3][1]; //到着時刻4M
-			panel[54] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[3] ? 0 : g_tims.Arrive[3][2]; //到着時刻4S
+			panel[90] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[3] ? 0 : g_tims.Arrive[3][2]; //到着時刻4S
 			panel[162] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[4] ? 0 : g_tims.Arrive[4][0]; //到着時刻5H
 			panel[16] = DispType != 5 && g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[4] ? 0 : g_tims.Arrive[4][1]; //到着時刻5M
-			panel[57] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[4] ? 0 : g_tims.Arrive[4][2]; //到着時刻5S
+			panel[93] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[4] ? 0 : g_tims.Arrive[4][2]; //到着時刻5S
 
 			//panel[150] = g_tims.HiddenLine[0] ? 0 : g_tims.Leave[0][0]; //発車時刻1H
 			panel[194] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[0] ? 0 : g_tims.Leave[0][1]; //発車時刻1M
@@ -363,9 +363,9 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 					panel[167] = g_9n.McKey != 6 ? 0 : g_tims.AfterTimeA[1]; //次採時駅着時刻M
 					panel[168] = g_9n.McKey != 6 ? 0 : g_tims.AfterTimeA[2]; //次採時駅着時刻S
 					//panel[174] = g_tims.AfterTimeL[0]; //次採時駅発時刻H
-					panel[169] = g_9n.McKey != 6 ? 0 : g_tims.AfterTimeL[1]; //次採時駅発時刻M
-					panel[170] = g_9n.McKey != 6 ? 0 : g_tims.AfterTimeL[2]; //次採時駅発時刻S
-					panel[171] = g_9n.McKey != 6 ? 0 : g_tims.AfterTrack; //次採時駅番線
+					panel[229] = g_9n.McKey != 6 ? 0 : g_tims.AfterTimeL[1]; //次採時駅発時刻M
+					panel[230] = g_9n.McKey != 6 ? 0 : g_tims.AfterTimeL[2]; //次採時駅発時刻S
+					panel[231] = g_9n.McKey != 6 ? 0 : g_tims.AfterTrack; //次採時駅番線
 				}
 
 				else
@@ -375,9 +375,9 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 					panel[167] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[5] ? 0 : g_tims.Arrive[5][1]; //到着時刻6M
 					panel[168] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[5] ? 0 : g_tims.Arrive[5][2]; //到着時刻6S
 					//panel[174] = g_tims.HiddenLine[5] ? 0 : g_tims.Leave[5][0]; //発車時刻6H
-					panel[169] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[5] ? 0 : g_tims.Leave[5][1]; //発車時刻6M
-					panel[170] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[5] ? 0 : g_tims.Leave[5][2]; //発車時刻6S
-					panel[171] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[5] ? 0 : g_tims.Track[5]; //次駅番線6
+					panel[229] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[5] ? 0 : g_tims.Leave[5][1]; //発車時刻6M
+					panel[230] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[5] ? 0 : g_tims.Leave[5][2]; //発車時刻6S
+					panel[231] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[5] ? 0 : g_tims.Track[5]; //次駅番線6
 				}
 
 				panel[177] = g_9n.McKey != 6 ? 0 : g_tims.Before; //直前採時駅
