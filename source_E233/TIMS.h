@@ -48,6 +48,7 @@ public:
 	int TrainArrow; //s˜H•\–îˆó
 	int Station[10]; //‰w–¼•\¦
 	int SESta[10]; //Ğü‰w–¼
+	int DispSESta[10];
 	int SEDirection; //Ğüis•ûŒü
 	int SEArea; //Ğü—p‘–s•û–Ê
 	int PassSta[10]; //’Ê‰ß‰w–¼•\¦
@@ -211,174 +212,47 @@ public:
 		{
 			if (SEDirection == 1) //‰c’cAüE¬“c‹}‰º‚è
 			{
-				switch (SESta[i])
-				{
-				case 56: //–kˆ»£
-					SESta[i + 1] = 101;
-					break;
-				case 101: //ˆ»£‰œæ
-					SESta[i + 1] = 57;
-					break;
-				case 58: //–kçZ
-					SESta[i + 1] = 102;
-					break;
-				case 102: //çZÜ•Ô
-					SESta[i + 1] = 59;
-					break;
-				case 62: //ª’Ã
-					SESta[i + 1] = 103;
-					break;
-				case 103: //“’“‡Yü
-					SESta[i + 1] = 63;
-					break;
-				case 64: //VŒä’ƒƒm…
-					SESta[i + 1] = 104;
-					break;
-				case 104: //‘åèÜ•Ô
-					SESta[i + 1] = 65;
-					break;
-				case 67: //“ú”ä’J
-					SESta[i + 1] = 105;
-					break;
-				case 105: //‰àŠÖÜ•Ô
-					SESta[i + 1] = 68;
-					break;
-				case 68: //‰àƒPŠÖ
-					SESta[i + 1] = 106;
-					break;
-				case 106: //‰àŠÖYü
-					SESta[i + 1] = 69;
-					break;
-				case 71: //”T–Øâ
-					SESta[i + 1] = 107;
-					break;
-				case 107: //Q“¹Ü•Ô
-					SESta[i + 1] = 72;
-					break;
-				case 73: //–¾¡_‹{
-					SESta[i + 1] = 108;
-					break;
-				case 108: //Œö‰€‘¤ü
-					SESta[i + 1] = 74;
-					break;
-				case 74: //‘ãX–ØŒö‰€
-					SESta[i + 1] = 31;
-					break;
-				case 49: //V•S‡ƒ–‹u
-					SESta[i + 1] = SEArea == 1 ? 93 : 50;
-					break;
-				case 53: //’¬“c
-					SESta[i + 1] = 13;
-					break;
-				case 13: //‘Š–Í‘å–ì
-					SESta[i + 1] = SEArea == 2 ? 12 : 75;
-					break;
-				case 12:
-				case 11:
-				case 10:
-				case 9:
-				case 8:
-				case 7:
-				case 6:
-				case 5:
-				case 4:
-				case 3:
-				case 2:
-					SESta[i + 1] = SESta[i] - 1; //]ƒm“‡ü’Êí
-					break;
-				case 1: //“¡‘ò–{’¬
-					SESta[i + 1] = 91;
-					break;
-				default:
-					SESta[i + 1] = SESta[i] + 1;//’Êí
-					break;
-				}
+				SESta[i + 1] = g_9n.SetSEStaA(SESta[i]);
 			}
 			else //‰c’cBüE¬“c‹}ã‚è
 			{
-				switch (SESta[i])
+				SESta[i + 1] = g_9n.SetSEStaB(SESta[i]);
+			}
+			if (i <= 4)
+			{
+				DispSESta[i] = SESta[i];
+			}
+		}
+
+		//~Ô‰w‚ªSESta[0]`SESta[3]‚Æˆê’v‚·‚éê‡
+		for (int i = 0; i < 4; i++)
+		{
+			if (SESta[i] == g_9n.ConvDest2Sta(g_9n.ArrivalSta))
+			{
+				DispSESta[4] = SESta[i]; //‹­§“I‚É5‰w–Ú‚Æ‚·‚é
+				for (int j = 4; j > 0; j--)//4`0‚Ì‰w–¼‚ğ‚ ‚Ä‚Í‚ß
 				{
-				case 57: //ˆ»£
-					SESta[i + 1] = 101;
-					break;
-				case 101: //ˆ»£‰œæ
-					SESta[i + 1] = 56;
-					break;
-				case 59: //’¬‰®
-					SESta[i + 1] = 102;
-					break;
-				case 102: //çZÜ•Ô
-					SESta[i + 1] = 58;
-					break;
-				case 63: //“’“‡
-					SESta[i + 1] = 103;
-					break;
-				case 103: //“’“‡Yü
-					SESta[i + 1] = 62;
-					break;
-				case 65: //‘åè’¬
-					SESta[i + 1] = 104;
-					break;
-				case 104: //‘åèÜ•Ô
-					SESta[i + 1] = 64;
-					break;
-				case 68: //‰àƒPŠÖ
-					SESta[i + 1] = 105;
-					break;
-				case 105: //‰àŠÖÜ•Ô
-					SESta[i + 1] = 67;
-					break;
-				case 69: //‘‰ï‹c–“°‘O
-					SESta[i + 1] = 106;
-					break;
-				case 106: //‰àŠÖYü
-					SESta[i + 1] = 68;
-					break;
-				case 72: //•\Q“¹
-					SESta[i + 1] = 107;
-					break;
-				case 107: //Q“¹Ü•Ô
-					SESta[i + 1] = 71;
-					break;
-				case 74: //‘ãX–ØŒö‰€
-					SESta[i + 1] = 108;
-					break;
-				case 108: //Œö‰€‘¤ü
-					SESta[i + 1] = 73;
-					break;
-				case 31: //‘ãX–ØãŒ´
-					SESta[i + 1] = SEArea == 0 ? 74 : 30;
-					break;
-				case 93: //ŒÜŒ‘ä
-					SESta[i + 1] = 49;
-					break;
-				case 75: //¬“c‹}‘Š–ÍŒ´
-					SESta[i + 1] = 13;
-					break;
-				case 13: //‘Š–Í‘å–ì
-					SESta[i + 1] = 53;
-					break;
-				case 12:
-				case 11:
-				case 10:
-				case 9:
-				case 8:
-				case 7:
-				case 6:
-				case 5:
-				case 4:
-				case 3:
-				case 2:
-				case 1:
-					SESta[i + 1] = SESta[i] + 1; //]ƒm“‡ü’Êí
-					break;
-				case 91: //“¡‘ò
-					SESta[i + 1] = 1;
-					break;
-				default:
-					SESta[i + 1] = SESta[i] - 1;//’Êí
-					break;
+					if (SEDirection == 1) //‰c’cAüE¬“c‹}‰º‚è
+					{
+						DispSESta[j - 1] = g_9n.SetSEStaB(DispSESta[j]);
+					}
+					else //‰c’cBüE¬“c‹}ã‚è
+					{
+						DispSESta[j - 1] = g_9n.SetSEStaA(DispSESta[j]);
+					}
 				}
+				for (int j = 4; j < 7; j++)//5`7‚Ì‰w–¼‚ğ‚ ‚Ä‚Í‚ß
+				{
+					if (SEDirection == 1) //‰c’cAüE¬“c‹}‰º‚è
+					{
+						DispSESta[j + 1] = g_9n.SetSEStaA(DispSESta[j]);
+					}
+					else //‰c’cBüE¬“c‹}ã‚è
+					{
+						DispSESta[j + 1] = g_9n.SetSEStaB(DispSESta[j]);
+					}
+				}
+				break;
 			}
 		}
 
@@ -704,6 +578,11 @@ public:
 	void SetSESta(int sta)
 	{
 		m_seSta = sta; //‰w–¼ƒf[ƒ^‚ğ“ü‚ê‚é
+		/*
+		//~Ô‰wˆ»£
+		if (g_9n.ArrivalSta == 42 && (sta == 59 || sta == 58 || sta == 57 || sta == 102))
+			sta = 60;
+			*/
 	}
 
 	//Ğü—p‰w–¼Š„‚İi603j
@@ -715,12 +594,14 @@ public:
 	void SetSEDirection(int data, int area)
 	{
 		SEDirection = data == 0 ? -1 : 1; //ã‚è—ñÔ‚Å‚ÍŒ¸Z
+		/*
 		if (area >= 51)
 			SEArea = 1;//‰º‚è‘½–€üEã‚èVhs‚«
 		if (area >= 31)
 			SEArea = 2;//‰º‚è]ƒm“‡ü
 		else
 			SEArea = 0;//‰º‚è¬“cŒ´üEã‚èç‘ã“cü
+			*/
 	}
 
 	//s˜H•\–îˆó‚Ìİ’èi117j

@@ -7,19 +7,21 @@
 #include "atsplugin.h"
 #include "ini.h"
 #include "main.h"
+#include "tims9n.h"
+
+tims9N g_9n; //うさプラ関連
+
 #include "tims.h"
 #include "Meter.h"
 #include "dead.h"
 #include "spp.h"
 #include "sub.h"
-#include "tims9n.h"
 
 TIMS g_tims; //TIMS表示器
 Meter g_meter; //メーター表示器
 SPP g_spp; //誤通過防止装置
 Sub g_sub; //その他
 DEAD g_dead; //電圧関係
-tims9N g_9n; //うさプラ関連
 
 BOOL APIENTRY DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
@@ -104,6 +106,7 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	g_sub.BcPressure = vehicleState.BcPressure;
 
 	g_9n.McKey = panel[160] == 5 ? 6 : panel[160];
+	g_9n.SetArrivalSta(panel[172]);
 
 	g_tims.Execute(); //TIMS表示器
 	g_meter.Execute(); //メーター表示器
@@ -271,11 +274,11 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 
 			// スタフテーブル
 			//電列共通
-			panel[43] = g_tims.HiddenLine[0] ? 0 : g_9n.McKey != 6 ? g_tims.SESta[0] : g_tims.Station[0]; //駅名表示1
-			panel[44] = g_tims.HiddenLine[1] ? 0 : g_9n.McKey != 6 ? g_tims.SESta[1] : g_tims.Station[1]; //駅名表示2
-			panel[45] = g_tims.HiddenLine[2] ? 0 : g_9n.McKey != 6 ? g_tims.SESta[2] : g_tims.Station[2]; //駅名表示3
-			panel[46] = g_tims.HiddenLine[3] ? 0 : g_9n.McKey != 6 ? g_tims.SESta[3] : g_tims.Station[3]; //駅名表示4
-			panel[47] = g_tims.HiddenLine[4] ? 0 : g_9n.McKey != 6 ? g_tims.SESta[4] : g_tims.Station[4]; //駅名表示5
+			panel[43] = g_tims.HiddenLine[0] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[0] : g_tims.Station[0]; //駅名表示1
+			panel[44] = g_tims.HiddenLine[1] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[1] : g_tims.Station[1]; //駅名表示2
+			panel[45] = g_tims.HiddenLine[2] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[2] : g_tims.Station[2]; //駅名表示3
+			panel[46] = g_tims.HiddenLine[3] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[3] : g_tims.Station[3]; //駅名表示4
+			panel[47] = g_tims.HiddenLine[4] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[4] : g_tims.Station[4]; //駅名表示5
 
 			panel[147] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[0] ? 0 : g_tims.Arrive[0][0]; //到着時刻1H
 			panel[4] = DispType != 5 && g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[0] ? 0 : g_tims.Arrive[0][1]; //到着時刻1M
@@ -387,7 +390,7 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 				panel[180] = g_9n.McKey != 6 ? 0 : g_tims.BeforeTrack; //直前採時駅番線
 
 				panel[210] = g_9n.McKey != 6 ? 0 : g_tims.Last; //降車駅
-				panel[234] = g_9n.McKey == 6 ? 0 : g_tims.Last; //降車駅
+				panel[234] = g_9n.McKey == 6 ? 0 : g_9n.ArrivalSta; //降車駅
 				panel[211] = g_9n.McKey != 6 ? 0 : g_tims.LastTimeA[0]; //降車駅着時刻H
 				panel[212] = g_9n.McKey != 6 ? 0 : g_tims.LastTimeA[1]; //降車駅着時刻M
 				panel[213] = g_9n.McKey != 6 ? 0 : g_tims.LastTimeA[2]; //降車駅着時刻S
@@ -1895,10 +1898,10 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	sound[105] = g_sub.EmgAnnounce; //非常ブレーキ放送
 	sound[106] = g_sub.UpdateInfo; //運行情報更新
 
-	sound[64] = g_spp.HaltChime3; //停車チャイムループ（減少しない）
-	sound[65] = g_spp.HaltChime; //停車チャイム
-	sound[66] = g_spp.PassAlarm; //通過チャイム
-	sound[63] = g_spp.HaltChime2; //停車チャイムループ
+	sound[64] = DispType == 9 && snp2Output == 0 && g_9n.McKey != 6 ? ATS_SOUND_STOP : g_spp.HaltChime3; //停車チャイムループ（減少しない）
+	sound[65] = DispType == 9 && snp2Output == 0 && g_9n.McKey != 6 ? ATS_SOUND_STOP : g_spp.HaltChime; //停車チャイム
+	sound[66] = DispType == 9 && snp2Output == 0 && g_9n.McKey != 6 ? ATS_SOUND_STOP : g_spp.PassAlarm; //通過チャイム
+	sound[63] = DispType == 9 && snp2Output == 0 && g_9n.McKey != 6 ? ATS_SOUND_STOP : g_spp.HaltChime2; //停車チャイムループ
 
     return g_output;
 }
