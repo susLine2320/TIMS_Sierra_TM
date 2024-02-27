@@ -87,6 +87,7 @@ ATS_API void WINAPI Initialize(int brake)
 {
 	g_speed = 0;
 	g_spp.Initialize();
+	g_9n.Init();
 }
 
 ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int *sound)
@@ -106,6 +107,7 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	g_sub.BcPressure = vehicleState.BcPressure;
 
 	g_9n.McKey = panel[160] == 5 ? 6 : panel[160];
+	g_9n.TrainType = panel[152];
 	g_9n.SetArrivalSta(panel[172]);
 
 	g_tims.Execute(); //TIMS•\¦Ší
@@ -266,7 +268,8 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 			panel[97] = g_9n.McKey == 6 && g_tims.Number[3] != 0 ? 1 : 0; //İ’èŠ®—¹
 			panel[165] = g_9n.McKey != 6 ? 0 : g_tims.PassMode; //’Ê‰ßİ’è
 			//‚¤‚³ƒvƒ‰panel[119] = g_tims.NextBlinkLamp; //Ÿ‰w’âÔ•\¦“”
-			panel[49] = g_9n.McKey == 6 ? 0 : g_tims.From; //‰^sƒpƒ^[ƒ“n”­
+			//panel[300] = g_tims.NextBlinkLamp; //Ÿ‰w’âÔ•\¦“”
+			//panel[49] = g_9n.McKey == 6 ? 0 : g_tims.From; //‰^sƒpƒ^[ƒ“n”­
 			panel[50] = g_9n.McKey == 6 ? 0 : g_tims.Destination; //‰^sƒpƒ^[ƒ“sæ
 			panel[61] = g_9n.McKey != 6 ? 0 : g_tims.For; //—ñÔsæ
 			//panel[209] = g_tims.This; //©‰wiTIS—pj
@@ -279,21 +282,31 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 			panel[45] = g_tims.HiddenLine[2] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[2] : g_tims.Station[2]; //‰w–¼•\¦3
 			panel[46] = g_tims.HiddenLine[3] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[3] : g_tims.Station[3]; //‰w–¼•\¦4
 			panel[47] = g_tims.HiddenLine[4] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[4] : g_tims.Station[4]; //‰w–¼•\¦5
-
+			/*
+			panel[343] = g_tims.HiddenLine[0] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[0] : g_tims.Station[0]; //‰w–¼•\¦1
+			panel[344] = g_tims.HiddenLine[1] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[1] : g_tims.Station[1]; //‰w–¼•\¦2
+			panel[345] = g_tims.HiddenLine[2] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[2] : g_tims.Station[2]; //‰w–¼•\¦3
+			panel[346] = g_tims.HiddenLine[3] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[3] : g_tims.Station[3]; //‰w–¼•\¦4
+			panel[347] = g_tims.HiddenLine[4] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[4] : g_tims.Station[4]; //‰w–¼•\¦5
+			*/
+			panel[141] = g_tims.GetPUFlag();
+			panel[142] = g_9n.NowSta + 1;
+			panel[143] = g_tims.GetMDist(0);
+			panel[144] = g_tims.GetMDist(1);
 			panel[147] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[0] ? 0 : g_tims.Arrive[0][0]; //“’…1H
-			panel[4] = DispType != 5 && g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[0] ? 0 : g_tims.Arrive[0][1]; //“’…1M
+			panel[4] = g_tims.HiddenLine[0] ? 0 : g_9n.McKey == 6 ? g_tims.Arrive[0][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_tims.DispSESta[0]); //“’…1M
 			panel[87] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[0] ? 0 : g_tims.Arrive[0][2]; //“’…1S
 			panel[148] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[1] ? 0 : g_tims.Arrive[1][0]; //“’…2H
-			panel[10] = DispType != 5 && g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[1] ? 0 : g_tims.Arrive[1][1]; //“’…2M
+			panel[10] = g_tims.HiddenLine[1] ? 0 : g_9n.McKey == 6 ? g_tims.Arrive[1][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_tims.DispSESta[1]); //“’…2M
 			panel[88] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[1] ? 0 : g_tims.Arrive[1][2]; //“’…2S
 			panel[158] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[2] ? 0 : g_tims.Arrive[2][0]; //“’…3H
-			panel[11] = DispType != 5 && g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[2] ? 0 : g_tims.Arrive[2][1]; //“’…3M
+			panel[11] = g_tims.HiddenLine[2] ? 0 : g_9n.McKey == 6 ? g_tims.Arrive[2][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_tims.DispSESta[2]); //“’…3M
 			panel[89] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[2] ? 0 : g_tims.Arrive[2][2]; //“’…3S
 			panel[159] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[3] ? 0 : g_tims.Arrive[3][0]; //“’…4H
-			panel[12] = DispType != 5 && g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[3] ? 0 : g_tims.Arrive[3][1]; //“’…4M
+			panel[12] = g_tims.HiddenLine[3] ? 0 : g_9n.McKey == 6 ? g_tims.Arrive[3][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_tims.DispSESta[3]); //“’…4M
 			panel[90] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[3] ? 0 : g_tims.Arrive[3][2]; //“’…4S
 			panel[162] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[4] ? 0 : g_tims.Arrive[4][0]; //“’…5H
-			panel[16] = DispType != 5 && g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[4] ? 0 : g_tims.Arrive[4][1]; //“’…5M
+			panel[16] = g_tims.HiddenLine[4] ? 0 : g_9n.McKey == 6 ? g_tims.Arrive[4][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_tims.DispSESta[4]); //“’…5M
 			panel[93] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[4] ? 0 : g_tims.Arrive[4][2]; //“’…5S
 
 			//panel[150] = g_tims.HiddenLine[0] ? 0 : g_tims.Leave[0][0]; //”­Ô1H
@@ -391,6 +404,7 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 
 				panel[210] = g_9n.McKey != 6 ? 0 : g_tims.Last; //~Ô‰w
 				panel[234] = g_9n.McKey == 6 ? 0 : g_9n.ArrivalSta; //~Ô‰w
+				panel[49] = g_9n.McKey == 6 ? 0 : g_9n.DepartSta; //æÔ‰w
 				panel[211] = g_9n.McKey != 6 ? 0 : g_tims.LastTimeA[0]; //~Ô‰w’…H
 				panel[212] = g_9n.McKey != 6 ? 0 : g_tims.LastTimeA[1]; //~Ô‰w’…M
 				panel[213] = g_9n.McKey != 6 ? 0 : g_tims.LastTimeA[2]; //~Ô‰w’…S
@@ -568,7 +582,7 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 			// ƒXƒ^ƒtƒe[ƒuƒ‹
 			//“d—ñ‹¤’Ê
 			panel[93] = g_tims.HiddenLine[0] ? 0 : g_9n.McKey != 6 ? g_tims.SESta[0] : g_tims.Station[0]; //‰w–¼•\¦1
-			panel[142] = g_tims.HiddenLine[1] ? 0 : g_9n.McKey != 6 ? g_tims.SESta[1] : g_tims.Station[1]; //‰w–¼•\¦2
+			//panel[142] = g_tims.HiddenLine[1] ? 0 : g_9n.McKey != 6 ? g_tims.SESta[1] : g_tims.Station[1]; //‰w–¼•\¦2
 			panel[45] = g_tims.HiddenLine[2] ? 0 : g_9n.McKey != 6 ? g_tims.SESta[2] : g_tims.Station[2]; //‰w–¼•\¦3
 			panel[46] = g_tims.HiddenLine[3] ? 0 : g_9n.McKey != 6 ? g_tims.SESta[3] : g_tims.Station[3]; //‰w–¼•\¦4
 			panel[47] = g_tims.HiddenLine[4] ? 0 : g_9n.McKey != 6 ? g_tims.SESta[4] : g_tims.Station[4]; //‰w–¼•\¦5
@@ -1978,11 +1992,11 @@ ATS_API void WINAPI SetBeaconData(ATS_BEACONDATA beaconData)
 		case 89: //•ûŒü”»’èEŒn“İ’èi‰º‚è31`]ƒm“‡üA51`‘½–€üAã‚è51`Vhs‚«j
 			g_tims.SetSEDirection(beaconData.Optional % 2, beaconData.Optional);
 			break;
-		case 603: //‰w–¼‹­§Š„‚İ
-			g_tims.SetSEStaExtra(beaconData.Optional);
-			break;
 		case 604: //‰w–¼“Ç‚İ‚İ
 			g_tims.SetSESta(beaconData.Optional);
+			break;
+		case 621: //‹——£’öİ’è
+			g_9n.SetLocation(beaconData.Optional);
 			break;
 		case 150://—ñ”Ô
 			g_tims.SetNumber(beaconData.Optional / 100, beaconData.Optional % 100);

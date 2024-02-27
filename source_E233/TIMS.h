@@ -224,32 +224,38 @@ public:
 			}
 		}
 
+		g_9n.NowSta = -1;//1段目
+
 		//降車駅がSESta[0]～SESta[3]と一致する場合
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			if (SESta[i] == g_9n.ConvDest2Sta(g_9n.ArrivalSta))
 			{
-				DispSESta[4] = SESta[i]; //強制的に5駅目とする
-				for (int j = 4; j > 0; j--)//4～0の駅名をあてはめ
+				g_9n.NowSta = 4 - i; //段数を入れる
+				if (i < 4)
 				{
-					if (SEDirection == 1) //営団A線・小田急下り
+					DispSESta[4] = SESta[i]; //強制的に5駅目とする
+					for (int j = 4; j > 0; j--)//4～0の駅名をあてはめ
 					{
-						DispSESta[j - 1] = g_9n.SetSEStaB(DispSESta[j]);
+						if (SEDirection == 1) //営団A線・小田急下り
+						{
+							DispSESta[j - 1] = g_9n.SetSEStaB(DispSESta[j]);
+						}
+						else //営団B線・小田急上り
+						{
+							DispSESta[j - 1] = g_9n.SetSEStaA(DispSESta[j]);
+						}
 					}
-					else //営団B線・小田急上り
+					for (int j = 4; j < 7; j++)//5～7の駅名をあてはめ
 					{
-						DispSESta[j - 1] = g_9n.SetSEStaA(DispSESta[j]);
-					}
-				}
-				for (int j = 4; j < 7; j++)//5～7の駅名をあてはめ
-				{
-					if (SEDirection == 1) //営団A線・小田急下り
-					{
-						DispSESta[j + 1] = g_9n.SetSEStaA(DispSESta[j]);
-					}
-					else //営団B線・小田急上り
-					{
-						DispSESta[j + 1] = g_9n.SetSEStaB(DispSESta[j]);
+						if (SEDirection == 1) //営団A線・小田急下り
+						{
+							DispSESta[j + 1] = g_9n.SetSEStaA(DispSESta[j]);
+						}
+						else //営団B線・小田急上り
+						{
+							DispSESta[j + 1] = g_9n.SetSEStaB(DispSESta[j]);
+						}
 					}
 				}
 				break;
@@ -263,7 +269,7 @@ public:
 
 			if (m_pushUpFlag == 1) //停車駅のとき
 			{
-				m_pushUpFlag = 2;
+				m_pushUpFlag = 2; //2 = 次2キロ割ったら更新
 			}
 		}
 
@@ -274,9 +280,11 @@ public:
 		//プッシュアップイベント
 		if (g_speed != 0) //駅ジャンプを除外する
 		{
-			if ((m_pushUpFlag == 2 && (m_pushUpBeacon == 1 || g_speed < 2.0f)) || (m_pushUpFlag == -1 && m_dist <= 0))
+			if ((m_pushUpFlag == 2 && (g_9n.McKey == 6 || m_tisFlag == 1) && (m_pushUpBeacon == 1 || g_speed < 2.0f)) || (m_pushUpFlag == -1 && (g_9n.McKey == 6 || m_tisFlag == 1) && m_dist <= 0)) //停通パターンにあたって2キロを割るか通過で距離程を割ると実行
+			//if ((m_pushUpFlag == 2 && (m_pushUpBeacon == 1 || m_dist <= 2 || !g_pilotLamp)) || (m_pushUpFlag == -1 && m_dist <= 0)) //停通パターンにあたって2キロを割るか通過で距離程を割ると実行
 			{
 				m_pushUpFlag = 0;
+				m_tisFlag = 0;
 
 				//ステップ更新の回数だけループ
 				for (; m_pushUpCount > 0; m_pushUpCount--)
@@ -313,6 +321,7 @@ public:
 					PushNext();
 					PushTimeStation();
 					PushTrainNumber();
+					PushSESta();
 				}
 			}
 		}
@@ -358,11 +367,21 @@ public:
 		}
 	}
 
+	int GetMDist(int flag)
+	{
+		return flag == 0 ? m_dist : m_tisFlag;
+	}
+	int GetPUFlag()
+	{
+		return m_pushUpFlag;
+	}
+
 	//開扉時に実行
 	void DoorOpen(void)
 	{
 		m_door = 0; //ドア状態
 		m_tmrVisible = 0; //表示の更新をさせない
+		m_tisFlag = 0;
 	}
 
 	//閉扉時に実行
@@ -378,7 +397,13 @@ public:
 	{
 		m_pushUpFlag = data >= 0 ? 1 : -1;
 		m_pushUpBeacon = 0;
-		m_pushUpCount = abs(data) > 100000 ? 0 : abs(data) / 10000 > 0 ? abs(data) / 10000 : 1;
+		if (g_9n.McKey == 6)//JRキーの時
+			m_pushUpCount = abs(data) > 100000 ? 0 : abs(data) / 10000 > 0 ? abs(data) / 10000 : 1; //10万以上は更新しない、1万の位は桁数
+		else//その他の時
+		{
+			m_pushUpCount = g_9n.NowSta >= 0 ? 0 : 1;
+			option = g_9n.NowSta >= 0 ? 1 : 0;
+		}
 		m_option = abs(option) > 0 ? 1 : 0;
 
 		m_dist = abs(data % 10000) - TIMS_OFFSET;
@@ -577,20 +602,17 @@ public:
 	//社線用駅名の設定（10，70，604）
 	void SetSESta(int sta)
 	{
+		if (g_9n.DepartSta == -1) { g_9n.DepartSta = sta; }//104番地上子がない時、最初の駅名を入れる
 		m_seSta = sta; //駅名データを入れる
-		/*
-		//降車駅綾瀬
-		if (g_9n.ArrivalSta == 42 && (sta == 59 || sta == 58 || sta == 57 || sta == 102))
-			sta = 60;
-			*/
+		m_tisFlag = 1;
 	}
-
+	/*
 	//社線用駅名割込み（603）
 	void SetSEStaExtra(int data)
 	{
 		SESta[0] = data;
 	}
-
+	*/
 	void SetSEDirection(int data, int area)
 	{
 		SEDirection = data == 0 ? -1 : 1; //上り列車では減算
@@ -712,6 +734,7 @@ private:
 	int m_pushUpFlag; //表示更新のフラグ
 	int m_pushUpBeacon; //表示更新の地上子
 	int m_pushUpCount; //表示更新の繰り返し数
+	int m_tisFlag; //TIS表示更新のフラグ
 	int m_tmrVisible; //モニタのステップ更新
 	int m_update[7]; //ステップ更新の状態
 	int m_thisName; //自駅駅名

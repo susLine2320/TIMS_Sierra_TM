@@ -4,8 +4,27 @@ class tims9N
 {
 public:
 	int McKey; //マスコンキー
+	int TrainType; //種別
+	int DepartSta; //乗車駅
 	int ArrivalSta; //降車駅
 	int SEArea; //社線用走行方面
+	int m_Location; //自駅距離程
+	int Location; //次駅距離程
+	int NowSta; //現在駅段数（原則0）
+
+	//初期化
+	void Init()
+	{
+		m_Location = 0;
+		Location = 0;
+		DepartSta = -1;
+	}
+
+	//毎フレーム実行
+	void Execute()
+	{
+		//m_Location
+	}
 
 	//毎フレーム実行降車駅
 	void SetArrivalSta(int ats172)
@@ -219,6 +238,12 @@ public:
 		return sta1;
 	}
 
+	//駅番号を行先番号に変換
+	int ConvSta2Dest(int sta)
+	{
+		return 0;
+	}
+
 	//行先番号を駅番号に変換
 	int ConvDest2Sta(int dest)
 	{
@@ -298,6 +323,39 @@ public:
 			break;
 		}
 		return sta;
+	}
+
+	//東西線向け通過駅設定
+	int SetTrainPass(int sta)
+	{
+#define PASS 62
+#define STOP 63
+		int ret = STOP;
+		switch (TrainType)
+		{
+		case 5: //A快速
+			if (sta == 36)
+				ret = PASS;
+		case 3: //B快速
+		case 7:
+			if (sta == 33 || sta == 34 || sta == 35)
+				ret = PASS;
+		case 4: //通勤快速
+			if (sta == 37 || sta == 38 || sta == 39 || sta == 40)
+				ret = PASS;
+			if (TrainType != 7)//東葉快速以外
+				break;
+			if (sta == 42 || sta == 43 || sta == 45 || sta == 47 || sta == 48)
+				ret = PASS;
+			break;
+		}
+		return ret;
+	}
+
+	void SetLocation(int loc)
+	{
+		m_Location = Location;
+		Location = loc;
 	}
 
 	//void Execute()
