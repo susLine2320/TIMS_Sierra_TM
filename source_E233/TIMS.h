@@ -602,7 +602,7 @@ public:
 	//社線用駅名の設定（10，70，604）
 	void SetSESta(int sta)
 	{
-		if (g_9n.DepartSta == -1) { g_9n.DepartSta = sta; }//104番地上子がない時、最初の駅名を入れる
+		if (g_9n.m_DepartSta == -1) { g_9n.m_DepartSta = sta; }//104番地上子がない時、最初の駅名を入れる
 		m_seSta = sta; //駅名データを入れる
 		m_tisFlag = 1;
 	}

@@ -109,12 +109,14 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	g_9n.McKey = panel[160] == 5 ? 6 : panel[160];
 	g_9n.TrainType = panel[152];
 	g_9n.SetArrivalSta(panel[172]);
+	g_9n.SetDepartSta();
 
 	g_tims.Execute(); //TIMS表示器
 	g_meter.Execute(); //メーター表示器
 	g_dead.execute(); //電圧関連
 	g_spp.Execute(); //誤通過防止装置
 	g_sub.Execute(); //他機能
+
 
 	// ハンドル出力
 	if(g_sub.BcPressCut == 1)

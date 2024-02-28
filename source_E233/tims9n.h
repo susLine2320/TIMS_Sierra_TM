@@ -5,6 +5,7 @@ class tims9N
 public:
 	int McKey; //マスコンキー
 	int TrainType; //種別
+	int m_DepartSta; //乗車駅変換前
 	int DepartSta; //乗車駅
 	int ArrivalSta; //降車駅
 	int SEArea; //社線用走行方面
@@ -17,7 +18,7 @@ public:
 	{
 		m_Location = 0;
 		Location = 0;
-		DepartSta = -1;
+		m_DepartSta = -1;
 	}
 
 	//毎フレーム実行
@@ -51,12 +52,72 @@ public:
 				ArrivalSta = 42;
 			}
 		}
-		if (ats172 == 21 || ats172 == 24)//新宿・唐木田行きは1
+		if (ats172 == 21)//新宿行きは1
 			SEArea = 1;
+		else if (ats172 == 24)//唐木田行きは3
+			SEArea = 3;
 		else if (ats172 == 14 || ats172 == 4 || ats172 == 5 || ats172 == 27 || ats172 == 28 || ats172 == 35)//大和・藤沢・江ノ島・長後行きは2
 			SEArea = 2;
 		else//他は0
 			SEArea = 0;
+	}
+
+	//毎フレーム実行乗車駅
+	void SetDepartSta()
+	{
+		DepartSta = ConvSta2Dest(m_DepartSta);
+		if (McKey == 7)
+		{
+			//小田急キーでメトロ以遠の始発駅の場合は代々木上原乗車
+			if ((DepartSta >= 15 && DepartSta <= 19) || (DepartSta >= 42 && DepartSta <= 48) || DepartSta == 50 || DepartSta == 51 || DepartSta == 57)
+			{
+				DepartSta = 41;
+			}
+		}
+		if (McKey == 1)
+		{
+			//メトロキーで小田急の行先の際は代々木上原降車
+			if ((DepartSta >= 1 && DepartSta <= 8) || (DepartSta >= 10 && DepartSta <= 14) || (DepartSta >= 21 && DepartSta <= 35))
+			{
+				DepartSta = 41;
+			}
+			//メトロキーでJRの行先の際は綾瀬降車
+			else if (DepartSta >= 15 && DepartSta <= 19)
+			{
+				DepartSta = 42;
+			}
+		}
+		if (ConvSta2Dest(m_DepartSta) == 21)//新宿始発は1
+		{
+			if (SEArea == 2 || SEArea == 3)
+				SEArea += 2;//4or5
+			else
+				SEArea = 3;
+		}
+		else if (ConvSta2Dest(m_DepartSta) == 24)//唐木田始発は3
+		{
+			if (SEArea == 1)
+				SEArea = 5;
+			else
+				SEArea = 2;
+		}
+		else if (ConvSta2Dest(m_DepartSta) == 14 || ConvSta2Dest(m_DepartSta) == 4 || ConvSta2Dest(m_DepartSta) == 5 || ConvSta2Dest(m_DepartSta) == 27 || ConvSta2Dest(m_DepartSta) == 28 || ConvSta2Dest(m_DepartSta) == 35)//大和・藤沢・江ノ島・長後始発は2
+		{
+			if (SEArea == 1)
+				SEArea = 4;
+			else
+				SEArea = 1;
+		}
+		else//他は0
+		{
+			if (SEArea == 2 || SEArea == 3)
+				SEArea -= 1;//1or2
+			else if (SEArea == 1)
+				SEArea = 3;
+			else
+				SEArea = 0;
+		}
+
 	}
 
 	//A線・1駅増加
@@ -117,13 +178,13 @@ public:
 			sta1 = 31;
 			break;
 		case 49: //新百合ヶ丘
-			sta1 = SEArea == 1 ? 93 : 50;
+			sta1 = SEArea % 3 == 2 ? 93 : 50;
 			break;
 		case 53: //町田
 			sta1 = 13;
 			break;
 		case 13: //相模大野
-			sta1 = SEArea == 2 ? 12 : 75;
+			sta1 = SEArea % 3 == 1 ? 12 : 75;
 			break;
 		case 12:
 		case 11:
@@ -203,7 +264,7 @@ public:
 			sta1 = 73;
 			break;
 		case 31: //代々木上原
-			sta1 = SEArea == 0 ? 74 : 30;
+			sta1 = SEArea / 3 == 0 ? 74 : 30;
 			break;
 		case 93: //五月台
 			sta1 = 49;
@@ -241,7 +302,77 @@ public:
 	//駅番号を行先番号に変換
 	int ConvSta2Dest(int sta)
 	{
-		return 0;
+		int dest = sta;
+		switch (sta)
+		{
+		case 3:
+			dest = 2;
+			break;
+		case 13:
+			dest = 1;
+			break;
+		case 80:
+			dest = 6;
+			break;
+		case 89:
+			dest = 7;
+			break;
+		case 45:
+			dest = 8;
+			break;
+		case 31:
+			dest = 9;
+			break;
+		case 37:
+			dest = 10;
+			break;
+		case 78:
+			dest = 11;
+			break;
+		case 82:
+			dest = 12;
+			break;
+		case 85:
+			dest = 13;
+			break;
+		case 8:
+			dest = 14;
+			break;
+		case 87:
+			dest = 42;
+			break;
+		case 56:
+			dest = 43;
+			break;
+		case 74:
+			dest = 44;
+			break;
+		case 58:
+			dest = 45;
+			break;
+		case 73:
+			dest = 46;
+			break;
+		case 68:
+			dest = 47;
+			break;
+		case 63:
+			dest = 48;
+			break;
+		case 72:
+			dest = 50;
+			break;
+		case 65:
+			dest = 51;
+			break;
+		case 62:
+			dest = 57;
+			break;
+		default:
+			dest = 0;
+			break;
+		}
+		return dest;
 	}
 
 	//行先番号を駅番号に変換
