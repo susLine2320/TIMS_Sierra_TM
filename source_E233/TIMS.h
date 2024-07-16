@@ -117,8 +117,8 @@ public:
 
 		StartingPoint = 0.0f;
 		Distance[0] = 0;
-		Distance[1] = 10;
-		Distance[2] = 10;
+		Distance[1] = 0;
+		Distance[2] = 0;
 		TimsSpeed[0] = 0;
 		TimsSpeed[1] = 0;
 		TimsSpeed[2] = 10;
@@ -135,14 +135,14 @@ public:
 		m_timerTims -= abs(g_deltaT); //毎フレーム減算
 		if (m_timerTims < 0)
 		{
-			double temp_distance = ((Location / 10) - (StartingPoint / 10)) * m_direction + m_distance + (m_distDef / 10);
+			double temp_distance = ((Location / 10) - (StartingPoint / 10)) * a_direction + a_distance + (a_distDef / 10);
 
 			//キロ程
 			Distance[0] = temp_distance / 100;
 			Distance[1] = (temp_distance / 10) - (Distance[0] * 10);
 			Distance[2] = temp_distance - (Distance[0] * 100 + Distance[1] * 10);
-			if (temp_distance >= 100 && Distance[0] == 0) { Distance[0] = 10; }
-			if (temp_distance >= 10 && Distance[1] == 0) { Distance[1] = 10; }
+			//if (temp_distance >= 100 && Distance[0] == 0) { Distance[0] = 10; }
+			//if (temp_distance >= 10 && Distance[1] == 0) { Distance[1] = 10; }
 
 			//速度計
 			TimsSpeed[0] = fabs(g_speed) / 100;
@@ -152,7 +152,7 @@ public:
 			if (fabs(g_speed) >= 100 && TimsSpeed[1] == 0) { TimsSpeed[1] = 10; }
 			if (TimsSpeed[2] == 0) { TimsSpeed[2] = 10; }
 
-			m_timerTims = 1200;
+			m_timerTims = TIMSLag;
 		}
 
 		//ユニット表示
@@ -382,12 +382,20 @@ public:
 		m_door = 0; //ドア状態
 		m_tmrVisible = 0; //表示の更新をさせない
 		m_tisFlag = 0;
+		RefreshDir();
 	}
 
 	//閉扉時に実行
 	void DoorClose(void)
 	{
 		m_door = 1; //ドア状態
+	}
+
+	void RefreshDir(void)
+	{
+		a_direction = m_direction;
+		a_distDef = m_distDef;
+		a_distance = m_distance;
 	}
 
 	//以下地上子通過時に実行
@@ -641,9 +649,10 @@ public:
 	}
 
 	//走行距離の設定（snp2-114）
-	void SetPositionDef(int data)
+	void SetPositionDef(int data, int option)
 	{
 		m_distDef = data; //列車位置の補正
+		if (option != 0) { m_direction = option; } //向きの修正
 	}
 
 	//スタフテーブルの書き込み（110～116）
@@ -768,6 +777,9 @@ private:
 	double m_distance; //走行距離
 	int m_direction; //距離減算するかどうか
 	int m_distDef; //列車位置の補正
+	double a_distance; //走行距離
+	int a_direction; //距離減算するかどうか
+	int a_distDef; //列車位置の補正
 	int m_timerTims; //TIMS表示器更新タイマー
 
 	//スタフテーブルのプッシュアップ

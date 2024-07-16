@@ -28,6 +28,7 @@ int LVindex; //架線電圧計
 int HVindex; //架線電圧計
 int BCMRType; //BC/MR圧計仕様
 int AMType; //電流計仕様
+int TIMSLag; //TIMS表示器のラグ
 int LineUpdate; //1行更新の時間
 int EbCut; //ブレーキ減圧時間
 int Lbinit; //初回起動時力行遅延

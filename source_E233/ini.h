@@ -127,6 +127,8 @@ public:
         int      BCMRType;                //BC/MR圧計仕様
         int      AMType;                  //電流計仕様
         int      LineUpdate;              //1行更新の時間
+        int      TIMSLag;                 //TIMS表示器のラグ
+        int      SoundIdx;                //音声のインデックス
     } Disp;
 
     // Emulate
@@ -164,6 +166,8 @@ protected:
         inimoni::inirw(r, f, s, _T("BCMRType         "), Disp.BCMRType);
         inimoni::inirw(r, f, s, _T("AMType           "), Disp.AMType);
         inimoni::inirw(r, f, s, _T("LineUpdate       "), Disp.LineUpdate);
+        inimoni::inirw(r, f, s, _T("TIMSLag          "), Disp.TIMSLag);
+        inimoni::inirw(r, f, s, _T("SoundIndex       "), Disp.SoundIdx);
 
         s = _T("Emulate");
         inimoni::inirw(r, f, s, _T("ebCutPressure    "), Emulate.ebCutPressure);
@@ -189,6 +193,8 @@ protected:
         Disp.BCMRType = 0;
         Disp.AMType = 0;
         Disp.LineUpdate = 90;
+        Disp.TIMSLag = 1200;
+        Disp.SoundIdx = 63;
         Emulate.ebCutPressure = 1000;
         Emulate.lbInit = 0;
         Emulate.KeyEvent = 0;
