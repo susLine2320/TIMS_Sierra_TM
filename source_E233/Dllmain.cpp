@@ -114,6 +114,7 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	g_9n.SetDepartSta();
 
 	g_tims.Execute(); //TIMS表示器
+	g_9n.Execute();
 	g_meter.Execute(); //メーター表示器
 	g_dead.execute(); //電圧関連
 	g_spp.Execute(); //誤通過防止装置
@@ -295,26 +296,26 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 
 			// スタフテーブル
 			//電列共通
-			panel[330] = g_tims.HiddenLine[0] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[0] : g_tims.Station[0]; //駅名表示1
-			panel[331] = g_tims.HiddenLine[1] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[1] : g_tims.Station[1]; //駅名表示2
-			panel[332] = g_tims.HiddenLine[2] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[2] : g_tims.Station[2]; //駅名表示3
-			panel[333] = g_tims.HiddenLine[3] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[3] : g_tims.Station[3]; //駅名表示4
-			panel[334] = g_tims.HiddenLine[4] ? 0 : g_9n.McKey != 6 ? g_tims.DispSESta[4] : g_tims.Station[4]; //駅名表示5
+			panel[330] = g_tims.HiddenLine[0] || g_9n.HiddenLine[0] ? 0 : g_9n.McKey != 6 ? g_9n.DispSESta[0] : g_tims.Station[0]; //駅名表示1
+			panel[331] = g_tims.HiddenLine[1] || g_9n.HiddenLine[1] ? 0 : g_9n.McKey != 6 ? g_9n.DispSESta[1] : g_tims.Station[1]; //駅名表示2
+			panel[332] = g_tims.HiddenLine[2] || g_9n.HiddenLine[2] ? 0 : g_9n.McKey != 6 ? g_9n.DispSESta[2] : g_tims.Station[2]; //駅名表示3
+			panel[333] = g_tims.HiddenLine[3] || g_9n.HiddenLine[3] ? 0 : g_9n.McKey != 6 ? g_9n.DispSESta[3] : g_tims.Station[3]; //駅名表示4
+			panel[334] = g_tims.HiddenLine[4] || g_9n.HiddenLine[4] ? 0 : g_9n.McKey != 6 ? g_9n.DispSESta[4] : g_tims.Station[4]; //駅名表示5
 
 			panel[335] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[0] ? 0 : g_tims.Arrive[0][0]; //到着時刻1H
-			panel[336] = g_tims.HiddenLine[0] ? 0 : g_9n.McKey == 6 ? g_tims.Arrive[0][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_tims.DispSESta[0]); //到着時刻1M
+			panel[336] = g_tims.HiddenLine[0]? 0 : g_9n.McKey == 6 ? g_tims.Arrive[0][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_9n.DispSESta[0]); //到着時刻1M
 			panel[337] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[0] ? 0 : g_tims.Arrive[0][2]; //到着時刻1S
 			panel[338] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[1] ? 0 : g_tims.Arrive[1][0]; //到着時刻2H
-			panel[339] = g_tims.HiddenLine[1] ? 0 : g_9n.McKey == 6 ? g_tims.Arrive[1][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_tims.DispSESta[1]); //到着時刻2M
+			panel[339] = g_tims.HiddenLine[1]? 0 : g_9n.McKey == 6 ? g_tims.Arrive[1][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_9n.DispSESta[1]); //到着時刻2M
 			panel[340] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[1] ? 0 : g_tims.Arrive[1][2]; //到着時刻2S
 			panel[341] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[2] ? 0 : g_tims.Arrive[2][0]; //到着時刻3H
-			panel[342] = g_tims.HiddenLine[2] ? 0 : g_9n.McKey == 6 ? g_tims.Arrive[2][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_tims.DispSESta[2]); //到着時刻3M
+			panel[342] = g_tims.HiddenLine[2]? 0 : g_9n.McKey == 6 ? g_tims.Arrive[2][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_9n.DispSESta[2]); //到着時刻3M
 			panel[343] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[2] ? 0 : g_tims.Arrive[2][2]; //到着時刻3S
 			panel[344] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[3] ? 0 : g_tims.Arrive[3][0]; //到着時刻4H
-			panel[345] = g_tims.HiddenLine[3] ? 0 : g_9n.McKey == 6 ? g_tims.Arrive[3][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_tims.DispSESta[3]); //到着時刻4M
+			panel[345] = g_tims.HiddenLine[3]? 0 : g_9n.McKey == 6 ? g_tims.Arrive[3][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_9n.DispSESta[3]); //到着時刻4M
 			panel[346] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[3] ? 0 : g_tims.Arrive[3][2]; //到着時刻4S
 			panel[347] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[4] ? 0 : g_tims.Arrive[4][0]; //到着時刻5H
-			panel[348] = g_tims.HiddenLine[4] ? 0 : g_9n.McKey == 6 ? g_tims.Arrive[4][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_tims.DispSESta[4]); //到着時刻5M
+			panel[348] = g_tims.HiddenLine[4]? 0 : g_9n.McKey == 6 ? g_tims.Arrive[4][1] : DispType != 5 ? 0 : g_9n.SetTrainPass(g_9n.DispSESta[4]); //到着時刻5M
 			panel[349] = g_9n.McKey != 6 ? 0 : g_tims.HiddenLine[4] ? 0 : g_tims.Arrive[4][2]; //到着時刻5S
 
 			//panel[150] = g_tims.HiddenLine[0] ? 0 : g_tims.Leave[0][0]; //発車時刻1H
@@ -1110,22 +1111,25 @@ ATS_API void WINAPI SetBeaconData(ATS_BEACONDATA beaconData)
 				g_spp.Recieve(beaconData.Optional % 100000);
 			break;
 		case 10: //メトロTIS駅名読み込み
-			g_tims.SetSESta(beaconData.Optional);
+			g_9n.SetSESta(g_9n.ConvUsao2TIMS(beaconData.Optional));
 			break;
 		case 53: //走行距離
 			g_tims.SetPositionDef(beaconData.Optional / 10, beaconData.Optional % 10 == 0 ? -1 : 1);
 			break;
 		case 70: //小田急TIS駅名割り込み
-			g_tims.SetSESta(beaconData.Optional / 100);
+			g_9n.SetSESta(beaconData.Optional / 100);
 			break;
 		case 89: //方向判定・系統設定（下り31～江ノ島線、51～多摩線、上り51～新宿行き）
-			g_tims.SetSEDirection(beaconData.Optional % 2, beaconData.Optional);
+			g_9n.SetSEDirection(beaconData.Optional % 2, beaconData.Optional);
 			break;
 		case 604: //駅名読み込み
-			g_tims.SetSESta(beaconData.Optional);
+			g_9n.SetSESta(beaconData.Optional);
 			break;
 		case 621: //距離程設定
 			g_9n.SetLocation(beaconData.Optional);
+			break;
+		case 622:
+			g_9n.RecieveSE(beaconData.Optional % 10000000, beaconData.Optional / 10000000);
 			break;
 		case 150://列番
 			g_tims.SetNumber(beaconData.Optional / 100, beaconData.Optional % 100);

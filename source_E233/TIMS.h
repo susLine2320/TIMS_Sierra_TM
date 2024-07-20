@@ -50,7 +50,7 @@ public:
 	int SESta[10]; //社線駅名
 	int DispSESta[10];
 	int SEDirection; //社線進行方向
-	int SEArea; //社線用走行方面
+	//int SEArea; //社線用走行方面
 	int PassSta[10]; //通過駅名表示
 	int Arrive[10][3]; //到着時刻
 	int Leave[10][3]; //発車時刻
@@ -405,9 +405,31 @@ public:
 	{
 		m_pushUpFlag = data >= 0 ? 1 : -1;
 		m_pushUpBeacon = 0;
-		if (g_9n.McKey == 6)//JRキーの時
+		//if (g_9n.McKey == 6)//JRキーの時
 			m_pushUpCount = abs(data) > 100000 ? 0 : abs(data) / 10000 > 0 ? abs(data) / 10000 : 1; //10万以上は更新しない、1万の位は桁数
-		else//その他の時
+		/*else//その他の時
+		{
+			m_pushUpCount = g_9n.NowSta >= 0 ? 0 : 1;
+			option = g_9n.NowSta >= 0 ? 1 : 0;
+		}*/
+		m_option = abs(option) > 0 ? 1 : 0;
+
+		m_dist = abs(data % 10000) - TIMS_OFFSET;
+		m_blinking = false;
+
+		if (g_speed == 0) //駅ジャンプを除外する
+		{
+			m_pushUpFlag = abs(data) < 100000 ? 3 : 0;
+			m_pushUpCount = 0;
+			m_dist = 0;
+		}
+	}
+
+	//次駅接近SE（622）
+	void RecieveSE(int data, int option)
+	{
+		m_pushUpFlag = data >= 0 ? 1 : -1;
+		m_pushUpBeacon = 0;
 		{
 			m_pushUpCount = g_9n.NowSta >= 0 ? 0 : 1;
 			option = g_9n.NowSta >= 0 ? 1 : 0;
