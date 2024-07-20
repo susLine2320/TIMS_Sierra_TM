@@ -47,9 +47,9 @@ public:
 	int AfterKind; //次運用列車種別
 	int TrainArrow; //行路表矢印
 	int Station[10]; //駅名表示
-	int SESta[10]; //社線駅名
-	int DispSESta[10];
-	int SEDirection; //社線進行方向
+	//int SESta[10]; //社線駅名
+	//int DispSESta[10];
+	//int SEDirection; //社線進行方向
 	//int SEArea; //社線用走行方面
 	int PassSta[10]; //通過駅名表示
 	int Arrive[10][3]; //到着時刻
@@ -206,7 +206,7 @@ public:
 			}
 			break;
 		}
-
+/*
 		//[TIMS9Nのみ]駅名の挿入
 		for (int i = 0; i < 7; i++)
 		{
@@ -261,7 +261,7 @@ public:
 				break;
 			}
 		}
-
+*/
 		//次駅を点滅させる
 		if (speed * speed / TIMS_DECELERATION >= m_dist - 50 && m_dist > 0 && !m_blinking) //速度照査（パターン)
 		{
@@ -309,7 +309,7 @@ public:
 								PushNext();
 								PushTimeStation();
 								PushTrainNumber();
-								PushSESta();
+								//PushSESta();
 							}
 						}
 					}
@@ -321,7 +321,7 @@ public:
 					PushNext();
 					PushTimeStation();
 					PushTrainNumber();
-					PushSESta();
+					//PushSESta();
 				}
 			}
 		}
@@ -332,7 +332,7 @@ public:
 			PushNext();
 			PushTimeStation();
 			PushTrainNumber();
-			PushSESta();
+			//PushSESta();
 
 			for (int i = 0; i < 10; i++)
 			{
@@ -344,7 +344,7 @@ public:
 			PushNext();
 			PushTimeStation();
 			PushTrainNumber();
-			PushSESta();
+			//PushSESta();
 		}
 
 		//ステップ更新の処理
@@ -366,7 +366,7 @@ public:
 			}
 		}
 	}
-
+	/*これは消さない
 	int GetMDist(int flag)
 	{
 		return flag == 0 ? m_dist : m_tisFlag;
@@ -375,7 +375,7 @@ public:
 	{
 		return m_pushUpFlag;
 	}
-
+	*/
 	//開扉時に実行
 	void DoorOpen(void)
 	{
@@ -424,7 +424,7 @@ public:
 			m_dist = 0;
 		}
 	}
-
+	/*
 	//次駅接近SE（622）
 	void RecieveSE(int data, int option)
 	{
@@ -446,7 +446,7 @@ public:
 			m_dist = 0;
 		}
 	}
-
+	*/
 	//自駅、次駅の設定（106）
 	void SetNext(int data)
 	{
@@ -628,7 +628,7 @@ public:
 		else//次採時駅設定
 			m_afterName = data;
 	}
-
+	/*
 	//社線用駅名の設定（10，70，604）
 	void SetSESta(int sta)
 	{
@@ -643,6 +643,7 @@ public:
 		SESta[0] = data;
 	}
 	*/
+	/*
 	void SetSEDirection(int data, int area)
 	{
 		SEDirection = data == 0 ? -1 : 1; //上り列車では減算
@@ -654,8 +655,8 @@ public:
 		else
 			SEArea = 0;//下り小田原線・上り千代田線
 			*/
-	}
-
+	//}
+	
 	//行路表矢印の設定（117）
 	void SetArrowState(int data)
 	{
@@ -770,7 +771,7 @@ private:
 	int m_update[7]; //ステップ更新の状態
 	int m_thisName; //自駅駅名
 	int m_nextName; //次駅駅名
-	int m_seSta; //社線用駅名ストック
+	//int m_seSta; //社線用駅名ストック
 	int m_nextTime[3]; //次駅時刻
 	int m_nextTrack; // 次駅到着番線
 	int m_beforeName; //直前採時駅名
@@ -847,13 +848,13 @@ private:
 			}
 		}
 	}
-
+	/*
 	//社線用駅名を更新
 	void PushSESta(void)
 	{
 		SESta[0] = m_seSta;
 	}
-
+	*/
 	//入力されている次駅を画面に反映
 	void PushNext(void)
 	{
