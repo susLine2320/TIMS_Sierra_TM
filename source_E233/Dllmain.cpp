@@ -78,6 +78,7 @@ ATS_API void WINAPI SetVehicleSpec(ATS_VEHICLESPEC vehicleSpec)
 	ETIMS = ini.Disp.EnableTIMSDisp;
 	EVmeter = ini.Disp.EnableVmeter;
 	EUD = ini.Disp.UnitDispEnable;
+	Dist = ini.Disp.UseDistance;
 	TIMSLag = abs(ini.Disp.TIMSLag);
 	LineUpdate = ini.Disp.LineUpdate >= 0 && ini.Disp.LineUpdate < 250 ? ini.Disp.LineUpdate : 90;
 	EbCut = ini.Emulate.ebCutPressure;
@@ -144,12 +145,20 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 		{
 			// 電流計
 			panel[186] = g_meter.AMMeterD[4]; //電流計[符号]
-			if (AMType <= 1 && (AMType >= 2 && g_meter.AMMeterA[0] > 0))
+			if (AMType <= 1)
 			{
 				panel[187] = g_meter.AMMeterD[0]; //電流計[1000位]
 				panel[188] = g_meter.AMMeterD[1]; //電流計[100位]
 				panel[189] = g_meter.AMMeterD[2]; //電流計[10位]
 				panel[190] = g_meter.AMMeterD[3]; //電流計[1位]
+			}
+			else if (AMType >= 2 && g_meter.AMMeterA[0] >= 0)
+			{
+				panel[187] = g_meter.AMMeterD[0] == 10 ? 20 : g_meter.AMMeterD[0]; //電流計[1000位]
+				panel[188] = g_meter.AMMeterD[1] == 10 ? 20 : g_meter.AMMeterD[1]; //電流計[100位]
+				panel[189] = g_meter.AMMeterD[2] == 10 ? 20 : g_meter.AMMeterD[2]; //電流計[10位]
+				panel[190] = g_meter.AMMeterD[3] == 10 ? 20 : g_meter.AMMeterD[3]; //電流計[1位]
+				if (g_meter.AMMeterA[1] < 1) { panel[190] = 21; }
 			}
 			else if(g_meter.AMMeterA[0] < 0)
 			{
@@ -157,13 +166,7 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 				panel[188] = g_meter.AMMeterD[1] + 10; //電流計[100位]
 				panel[189] = g_meter.AMMeterD[2] + 10; //電流計[10位]
 				panel[190] = g_meter.AMMeterD[3] + 10; //電流計[1位]
-			}
-			else
-			{
-				panel[187] = 0; //電流計[1000位]
-				panel[188] = 0; //電流計[100位]
-				panel[189] = 0; //電流計[10位]
-				panel[190] = 0; //電流計[1位]
+				if (g_meter.AMMeterA[1] < 1) { panel[190] = 21; }
 			}
 			panel[199] = AMType == 1 || AMType == 3 ? g_meter.AMMeterA[1] : g_meter.AMMeterA[0]; //電流計[指針]
 			panel[149] = g_meter.AMMeter[0]; //電流グラフ（+）
@@ -253,9 +256,12 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 		panel[94] = g_tims.TimsSpeed[1]; //TIMS速度計[10位]
 		panel[95] = g_tims.TimsSpeed[2]; //TIMS速度計[1位]
 		// 走行距離
-		panel[13] = g_tims.Distance[0]; //走行距離[km]
-		panel[14] = g_tims.Distance[1]; //走行距離[100m]
-		panel[15] = g_tims.Distance[2]; //走行距離[10m]
+		if (Dist == 1)
+		{
+			panel[13] = g_tims.Distance[0]; //走行距離[km]
+			panel[14] = g_tims.Distance[1]; //走行距離[100m]
+			panel[15] = g_tims.Distance[2]; //走行距離[10m]
+		}
 		// 矢印
 		panel[84] = g_tims.ArrowDirection; //進行方向矢印
 		// ユニット表示灯
@@ -1102,6 +1108,31 @@ ATS_API void WINAPI SetBeaconData(ATS_BEACONDATA beaconData)
 	{
 		snp2Beacon = beaconData.Optional == 0 ? 0 : 1;
 	}
+	switch (beaconData.Type)//メトロ互換は615番地上子によらない
+	{
+	case 10: //メトロTIS駅名読み込み
+		g_9n.SetSESta(g_9n.ConvUsao2TIMS(beaconData.Optional));
+		break;
+	case 53: //走行距離
+		g_tims.SetPositionDef(beaconData.Optional / 10, beaconData.Optional % 10 == 0 ? -1 : 1);
+		break;
+	case 70: //小田急TIS駅名割り込み
+		g_9n.SetSESta(beaconData.Optional / 100);
+		break;
+	case 89: //方向判定・系統設定（下り31～江ノ島線、51～多摩線、上り51～新宿行き）
+		g_9n.SetSEDirection(beaconData.Optional % 2, beaconData.Optional);
+		break;
+	case 604: //駅名読み込み
+		g_9n.SetSESta(beaconData.Optional);
+		break;
+	case 621: //距離程設定
+		g_9n.SetLocation(beaconData.Optional);
+		break;
+	case 622:
+		g_9n.RecieveSE(beaconData.Optional % 10000000, beaconData.Optional / 10000000);
+		break;
+
+	}
 	if (snp2Beacon != 1)
 	{
 		switch (beaconData.Type)
@@ -1109,27 +1140,6 @@ ATS_API void WINAPI SetBeaconData(ATS_BEACONDATA beaconData)
 		case 30://次駅接近
 			if (g_speed != 0)//駅ジャンプを除外する
 				g_spp.Recieve(beaconData.Optional % 100000);
-			break;
-		case 10: //メトロTIS駅名読み込み
-			g_9n.SetSESta(g_9n.ConvUsao2TIMS(beaconData.Optional));
-			break;
-		case 53: //走行距離
-			g_tims.SetPositionDef(beaconData.Optional / 10, beaconData.Optional % 10 == 0 ? -1 : 1);
-			break;
-		case 70: //小田急TIS駅名割り込み
-			g_9n.SetSESta(beaconData.Optional / 100);
-			break;
-		case 89: //方向判定・系統設定（下り31～江ノ島線、51～多摩線、上り51～新宿行き）
-			g_9n.SetSEDirection(beaconData.Optional % 2, beaconData.Optional);
-			break;
-		case 604: //駅名読み込み
-			g_9n.SetSESta(beaconData.Optional);
-			break;
-		case 621: //距離程設定
-			g_9n.SetLocation(beaconData.Optional);
-			break;
-		case 622:
-			g_9n.RecieveSE(beaconData.Optional % 10000000, beaconData.Optional / 10000000);
 			break;
 		case 150://列番
 			g_tims.SetNumber(beaconData.Optional / 100, beaconData.Optional % 100);

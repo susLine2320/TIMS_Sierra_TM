@@ -119,6 +119,7 @@ public:
         int      EnableTIMSDisp;          //TIMS表示の有効化
         int      EnableVmeter;            //電圧計表示の有効化
         int      UnitDispEnable;          //ユニット表示灯の有効化
+        int      UseDistance;             //走行距離表示
         int      D01ABnum;                //表示する駅数
         int      Row6;                    //6段目の扱い（電車用のみ）
         int      LVMeterindex;            //制御電圧計
@@ -158,6 +159,7 @@ protected:
         inimoni::inirw(r, f, s, _T("EnableTIMSDisp   "), Disp.EnableTIMSDisp);
         inimoni::inirw(r, f, s, _T("EnableVmeter     "), Disp.EnableVmeter);
         inimoni::inirw(r, f, s, _T("UnitDispEnable   "), Disp.UnitDispEnable);
+        inimoni::inirw(r, f, s, _T("UseDistance      "), Disp.UseDistance);
         inimoni::inirw(r, f, s, _T("D01ABnum         "), Disp.D01ABnum);
         inimoni::inirw(r, f, s, _T("Row6             "), Disp.Row6);
         inimoni::inirw(r, f, s, _T("LVMeterindex     "), Disp.LVMeterindex);
