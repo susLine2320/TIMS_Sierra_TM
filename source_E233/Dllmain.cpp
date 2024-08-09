@@ -283,18 +283,12 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 		if (ETIMS != 0)
 		{
 			//TIMS全般表示
-			panel[301] = g_9n.Array; //行路表矢印
+			panel[301] = g_9n.McKey != 6 ? g_9n.Array : g_tims.TrainArrow; //行路表矢印
 			panel[302] = g_9n.McKey != 6 ? 0 : g_tims.Kind; //列車種別
-			//panel[303] = g_9n.McKey != 6 ? 0 : g_tims.Number[0]; //列車番号[1000位]
-			//panel[304] = g_9n.McKey != 6 ? 0 : g_tims.Number[1]; //列車番号[100位]
-			//panel[305] = g_9n.McKey != 6 ? 0 : g_tims.Number[2]; //列車番号[10位]
-			//panel[306] = g_9n.McKey != 6 ? 0 : g_tims.Number[3]; //列車番号[1位]
-			//
-			panel[303] = g_9n.Location / 1000; //列車番号[1000位]
-			panel[304] = (g_9n.Location % 1000) / 100; //列車番号[100位]
-			panel[305] = (g_9n.Location % 100) / 10; //列車番号[10位]
-			panel[306] = g_9n.Location % 10; //列車番号[1位]
-			//
+			panel[303] = g_9n.McKey != 6 ? 0 : g_tims.Number[0]; //列車番号[1000位]
+			panel[304] = g_9n.McKey != 6 ? 0 : g_tims.Number[1]; //列車番号[100位]
+			panel[305] = g_9n.McKey != 6 ? 0 : g_tims.Number[2]; //列車番号[10位]
+			panel[306] = g_9n.McKey != 6 ? 0 : g_tims.Number[3]; //列車番号[1位]
 			panel[307] = g_9n.McKey != 6 ? 0 : g_tims.Charactor; //列車番号[記号]
 
 			panel[308] = g_9n.McKey == 6 && g_tims.Number[3] != 0 ? 1 : 0; //設定完了
@@ -1134,7 +1128,7 @@ ATS_API void WINAPI SetBeaconData(ATS_BEACONDATA beaconData)
 	case 621: //距離程設定
 		g_9n.SetLocation(beaconData.Optional);
 		break;
-	case 622:
+	case 622: //次駅設定
 		g_9n.RecieveSE(beaconData.Optional % 10000000, beaconData.Optional / 10000000);
 		break;
 

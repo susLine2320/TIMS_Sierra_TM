@@ -13,8 +13,8 @@ public:
 	int DepartSta; //æÔ‰w
 	int ArrivalSta; //~Ô‰w
 	int SEArea; //Ğü—p‘–s•û–Ê
-	int m_Location; //©‰w‹——£’ö
-	int Location; //Ÿ‰w‹——£’ö
+	//int m_Location; //©‰w‹——£’ö
+	//int Location; //Ÿ‰w‹——£’ö
 	int Array;
 	int NowSta; //Œ»İ‰w’i”iŒ´‘¥0j
 	int SESta[10]; //Ğü‰w–¼
@@ -26,8 +26,8 @@ public:
 	//‰Šú‰»
 	void Init()
 	{
-		m_Location = 0;
-		Location = 0;
+		//m_Location = 0;
+		//Location = 0;
 		m_DepartSta = -1;
 
 		m_dist = 0;
@@ -47,7 +47,6 @@ public:
 		float def = speed / 3600 * g_deltaT; //1ƒtƒŒ[ƒ€‚Å“®‚¢‚½‹——£iâ‘Î’lj[m]
 		m_dist -= def; //c‚è‹——£‚ğŒ¸Z‚·‚é
 		m_array -= def;
-		Location = m_array;
 		if (m_array != 0 && m_array >= m_array2 * 2 / 3) //c‹——£2/3ˆÈã
 			Array = 1;
 		else if (m_array != 0 && m_array >= m_array2 / 3)
