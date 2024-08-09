@@ -15,6 +15,7 @@ public:
 	int SEArea; //社線用走行方面
 	int m_Location; //自駅距離程
 	int Location; //次駅距離程
+	int Array;
 	int NowSta; //現在駅段数（原則0）
 	int SESta[10]; //社線駅名
 	int DispSESta[10];
@@ -30,6 +31,8 @@ public:
 		m_DepartSta = -1;
 
 		m_dist = 0;
+		m_array = 0;
+		m_array2 = 0;
 
 		m_pushUpFlag = -1;
 		m_pushUpBeacon = 0;
@@ -43,6 +46,18 @@ public:
 		float speed = fabsf(g_speed); //速度の絶対値[km/h]
 		float def = speed / 3600 * g_deltaT; //1フレームで動いた距離（絶対値）[m]
 		m_dist -= def; //残り距離を減算する
+		m_array -= def;
+		Location = m_array;
+		if (m_array != 0 && m_array >= m_array2 * 2 / 3) //残距離2/3以上
+			Array = 1;
+		else if (m_array != 0 && m_array >= m_array2 / 3)
+			Array = 2;
+		else if (m_array > 0)
+			Array = 3;
+		else
+			Array = 0;
+		Array += max(NowSta, 0) * 4;
+		if (Array > 16) { Array = 16; }
 
 		//[TIMS9Nのみ]駅名の挿入
 		for (int i = 0; i < 7; i++)
@@ -756,15 +771,23 @@ public:
 		return ret;
 	}
 
+	//行路表矢印
 	void SetLocation(int loc)
 	{
-		m_Location = Location;
-		Location = loc;
+		//m_Location = Location;
+		//Location = loc;
+		if (g_speed != 0) {//駅ジャンプ以外
+			m_array = loc;
+			m_array2 = loc;
+		}
 	}
 
 private:
 	float m_dist; //停止予定点距離
 	bool m_blinking; //次駅点滅かどうか
+
+	float m_array;
+	float m_array2;
 
 	int m_pushUpFlag; //表示更新のフラグ
 	int m_pushUpBeacon; //表示更新の地上子
