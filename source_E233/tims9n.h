@@ -738,7 +738,7 @@ public:
 		case 75:
 			return 120;
 		default:
-			return sta + 150;
+			return sta + 150; //“Œ¼üE“Œ—t‚‘¬ü
 		}
 	}
 
