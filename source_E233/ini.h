@@ -187,6 +187,7 @@ protected:
         Disp.EnableTIMSDisp = 1;
         Disp.EnableVmeter = 1;
         Disp.UnitDispEnable = 1;
+        Disp.UseDistance = 1;
         Disp.D01ABnum = 5;
         Disp.Row6 = 0;
         Disp.LVMeterindex = 73;
