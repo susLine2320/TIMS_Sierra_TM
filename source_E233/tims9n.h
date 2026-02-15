@@ -10,6 +10,8 @@ public:
 	int McKey; //マスコンキー
 	int Company;	//走行社局（JR:1,地下鉄:4,小田急:7）
 	int TrainType; //種別
+	int FromSta;	//列車始発駅
+	int DestinationSta;	//列車終着駅
 	int m_DepartSta; //乗車駅変換前
 	int DepartSta; //乗車駅
 	int ArrivalSta; //降車駅
@@ -33,6 +35,8 @@ public:
 		//Location = 0;
 		m_DepartSta = -1;
 		Company = 7;
+		m_seDestination = 0;
+		m_seFrom = -1;
 
 		m_dist = 0;
 		m_array = 0;
@@ -144,7 +148,7 @@ public:
 		{
 			PushSESta();
 		}
-		Debug[0] = m_pushUpFlag;
+		Debug[0] = m_seSta;
 # if 0
 		//プッシュアップイベント
 		if (g_speed != 0) //駅ジャンプを除外する
@@ -244,7 +248,7 @@ public:
 	//社線用駅名の設定（10，70，604）
 	void SetSESta(int sta)
 	{
-		if (m_DepartSta == -1) {m_DepartSta = sta; }//104番地上子がない時、最初の駅名を入れる
+		if (m_seFrom == -1) {m_seFrom = ConvSta2Dest(sta); }//104番地上子がない時、最初の駅名を入れる
 		m_seSta = sta; //駅名データを入れる
 		m_tisFlag = 1;
 	}
@@ -268,12 +272,12 @@ public:
 	//毎フレーム実行降車駅
 	void SetArrivalSta(int ats172)
 	{
-		ArrivalSta = ats172;
+		ArrivalSta = DestinationSta;
 		//if (McKey == 7)
 		if (Company == 7)
 		{
 			//小田急キーでメトロ以遠の行先の際は代々木上原降車
-			if ((ats172 >= 15 && ats172 <= 19) || (ats172 >= 42 && ats172 <= 48) || ats172 == 50 || ats172 == 51 || ats172 == 57)
+			if ((ArrivalSta >= 15 && ArrivalSta <= 19) || (ArrivalSta >= 42 && ArrivalSta <= 48) || ArrivalSta == 50 || ArrivalSta == 51 || ArrivalSta == 57)
 			{
 				ArrivalSta = 41;
 			}
@@ -282,12 +286,20 @@ public:
 		if(Company == 4)
 		{
 			//メトロキーで小田急の行先の際は代々木上原降車
-			if ((ats172 >= 1 && ats172 <= 8) || (ats172 >= 10 && ats172 <= 14) || (ats172 >= 21 && ats172 <= 35))
+			if ((ArrivalSta >= 1 && ArrivalSta <= 8) || (ArrivalSta >= 10 && ArrivalSta <= 14) || (ArrivalSta >= 21 && ArrivalSta <= 35))
 			{
 				ArrivalSta = 41;
 			}
 			//メトロキーでJRの行先の際は綾瀬降車
-			else if (ats172 >= 15 && ats172 <= 19)
+			else if (ArrivalSta >= 15 && ArrivalSta <= 19)
+			{
+				ArrivalSta = 42;
+			}
+		}
+		if (Company == 1)
+		{
+			//JRキーでメトロ以遠の行先の際は綾瀬降車
+			if ((ArrivalSta >= 1 && ArrivalSta <= 14) || (ArrivalSta >= 42 && ArrivalSta <= 48) || ArrivalSta == 50 || ArrivalSta == 51 || ArrivalSta == 57 || (ArrivalSta >= 21 && ArrivalSta <= 35))
 			{
 				ArrivalSta = 42;
 			}
@@ -306,7 +318,7 @@ public:
 	//毎フレーム実行乗車駅
 	void SetDepartSta()
 	{
-		DepartSta = ConvSta2Dest(m_DepartSta);
+		DepartSta = FromSta;
 		//if (McKey == 7)
 		if (Company == 7)
 		{
@@ -326,6 +338,14 @@ public:
 			}
 			//メトロキーでJRの行先の際は綾瀬降車
 			else if (DepartSta >= 15 && DepartSta <= 19)
+			{
+				DepartSta = 42;
+			}
+		}
+		if (Company == 1)
+		{
+			//JRキーでメトロ以遠の行先の際は綾瀬降車
+			if ((DepartSta >= 1 && DepartSta <= 14) || (DepartSta >= 42 && DepartSta <= 48) || DepartSta == 50 || DepartSta == 51 || DepartSta == 57 || (DepartSta >= 21 && DepartSta <= 35))
 			{
 				DepartSta = 42;
 			}
@@ -420,6 +440,9 @@ public:
 			sta1 = 74;
 			break;
 			*/
+		case 95: //綾瀬
+			sta1 = Company == 1 ? 14 : 96;
+			break;
 		case 119: //代々木公園
 			sta1 = 31;
 			break;
@@ -536,6 +559,9 @@ public:
 			sta1 = 13;
 			break;
 			*/
+		case 14: //亀有
+			sta1 = 95;
+			break;
 		case 13: //相模大野
 			sta1 = 53;
 			break;
@@ -635,6 +661,18 @@ public:
 		case 101:
 			dest = 57;
 			break;
+		case 16:
+			dest = 16;
+			break;
+		case 22:
+			dest = 17;
+			break;
+		case 24:
+			dest = 18;
+			break;
+		case 26:
+			dest = 19;
+			break;
 		default:
 			dest = 0;
 			break;
@@ -717,6 +755,18 @@ public:
 		case 57:
 			sta = 101;
 			break;
+		case 16:
+			sta = 16;
+			break;
+		case 17:
+			sta = 22;
+			break;
+		case 18:
+			sta = 24;
+			break;
+		case 19:
+			sta = 26;
+			break;
 		default:
 			break;
 		}
@@ -731,7 +781,21 @@ public:
 		{
 		case 13:
 			return 95;
-		case 56:
+		case 14://亀有
+		case 15:
+		case 16:
+		case 17:
+		case 18:
+		case 19:
+		case 20:
+		case 21:
+		case 22:
+		case 23:
+		case 24:
+		case 25:
+		case 26://取手
+			return sta;
+		case 56://北綾瀬
 			return 93;
 		case 57:
 			return 95;
@@ -769,7 +833,7 @@ public:
 			return 117;
 		case 74:
 			return 119;
-		case 75:
+		case 75://上原
 			return 120;
 		default:
 			return sta + 150; //東西線・東葉高速線
@@ -804,11 +868,9 @@ public:
 		return ret;
 	}
 
-	//行路表矢印
+	//行路表矢印（621）
 	void SetLocation(int loc)
 	{
-		//m_Location = Location;
-		//Location = loc;
 		if (g_speed != 0) {//駅ジャンプ以外
 			m_array = loc;
 			m_array2 = loc;
@@ -816,6 +878,17 @@ public:
 			//まだ更新できてなかった時用
 			PushSESta();
 		}
+	}
+
+	//行先設定（2,18）
+	void SetDestination(int sta)
+	{
+		m_seDestination = sta;
+	}
+	//始発（623）
+	void SetFrom(int sta)
+	{
+		m_seFrom = sta;
 	}
 
 private:
@@ -831,6 +904,8 @@ private:
 
 	int m_tisFlag; //TIS表示更新のフラグ
 	int m_seSta; //社線用駅名ストック
+	int m_seDestination;	//列車終着駅ストック
+	int m_seFrom;	//列車始発駅ストック
 
 	int m_seDirection; //走行方向ストック
 	int m_company;	//社局ストック
@@ -844,6 +919,8 @@ private:
 	{
 		Company = m_company;	//メモリー更新
 		SEDirection = m_seDirection;	//メモリー更新
+		DestinationSta = m_seDestination;	//メモリー更新
+		FromSta = m_seFrom;	//メモリー更新
 		SESta[0] = m_seSta;
 	}
 };

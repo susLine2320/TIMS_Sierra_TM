@@ -1110,8 +1110,14 @@ ATS_API void WINAPI SetBeaconData(ATS_BEACONDATA beaconData)
 	}
 	switch (beaconData.Type)//メトロ互換は615番地上子によらない
 	{
+	case 2: //小田急PI行先
+		g_9n.SetDestination(beaconData.Optional / 10000 % 100);
+		break;
 	case 10: //メトロTIS駅名読み込み
 		g_9n.SetSESta(g_9n.ConvUsao2TIMS(beaconData.Optional));
+		break;
+	case 18: //メトロPI行先
+		g_9n.SetDestination(beaconData.Optional / 100 % 100);
 		break;
 	case 19: //方向判定・系統設定
 		g_9n.SetSEDirection(beaconData.Optional % 2, beaconData.Optional / 10);
@@ -1131,8 +1137,8 @@ ATS_API void WINAPI SetBeaconData(ATS_BEACONDATA beaconData)
 	case 621: //距離程設定
 		g_9n.SetLocation(beaconData.Optional);
 		break;
-	case 624: //次駅設定
-		g_9n.RecieveSE(beaconData.Optional % 10000000, beaconData.Optional / 10000000);
+	case 623://始発駅
+		g_9n.SetFrom(beaconData.Optional);
 		break;
 
 	}
