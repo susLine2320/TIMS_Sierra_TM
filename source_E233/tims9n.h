@@ -23,6 +23,8 @@ public:
 	//int SEArea; //社線用走行方面
 	int HiddenLine[10]; //更新時に1行ずつ非表示にする
 
+	int Debug[3];
+
 	//初期化
 	void Init()
 	{
@@ -49,7 +51,7 @@ public:
 		m_array -= def;
 		if (m_array != 0 && m_array >= m_array2 * 2 / 3) //残距離2/3以上
 			Array = 1;
-		else if (m_array != 0 && m_array >= m_array2 / 3)
+		else if (m_array != 0 && m_array >= m_array2 / 3) //残距離1/3以上
 			Array = 2;
 		else if (m_array > 0)
 			Array = 3;
@@ -113,7 +115,7 @@ public:
 			}
 		}
 		//次駅を点滅させる
-		if (speed * speed / TIMS_DECELERATION >= m_dist - 50 && m_dist > 0) //速度照査（パターン)
+		if (speed * speed / TIMS_DECELERATION >= m_array - 50 && m_array > 0) //速度照査（パターン)
 		{
 			//m_blinking = true;
 
@@ -123,6 +125,25 @@ public:
 			}
 		}
 
+		if (m_pushUpFlag == 2 && m_tisFlag == 1 && ((g_speed != 0 && m_array <= 0) || !g_pilotLamp))
+		{
+			m_pushUpFlag = 0;
+			m_array = 0;
+
+			PushSESta();
+		}
+		//以後駅ジャンプ
+		else if (m_pushUpFlag == 3 || m_pushUpBeacon == 2)
+		{
+			m_pushUpFlag = 0;
+			PushSESta();
+		}
+		else if (m_pushUpFlag == -1) //起動時の初期化
+		{
+			PushSESta();
+		}
+		Debug[0] = m_pushUpFlag;
+# if 0
 		//プッシュアップイベント
 		if (g_speed != 0) //駅ジャンプを除外する
 		{
@@ -192,7 +213,9 @@ public:
 				HiddenLine[i] = 0;
 			}
 		}
+#endif
 	}
+
 
 	//次駅接近SE（622）
 	void RecieveSE(int data, int option)
@@ -778,6 +801,9 @@ public:
 		if (g_speed != 0) {//駅ジャンプ以外
 			m_array = loc;
 			m_array2 = loc;
+			m_pushUpFlag = 1;
+			//まだ更新できてなかった時用
+			PushSESta();
 		}
 	}
 
@@ -785,8 +811,8 @@ private:
 	float m_dist; //停止予定点距離
 	bool m_blinking; //次駅点滅かどうか
 
-	float m_array;
-	float m_array2;
+	float m_array; //残距離（走行により減少）
+	float m_array2; //駅間距離（駅間一定）
 
 	int m_pushUpFlag; //表示更新のフラグ
 	int m_pushUpBeacon; //表示更新の地上子

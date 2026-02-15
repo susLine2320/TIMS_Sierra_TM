@@ -1128,7 +1128,7 @@ ATS_API void WINAPI SetBeaconData(ATS_BEACONDATA beaconData)
 	case 621: //‹——£’öİ’è
 		g_9n.SetLocation(beaconData.Optional);
 		break;
-	case 622: //Ÿ‰wİ’è
+	case 624: //Ÿ‰wİ’è
 		g_9n.RecieveSE(beaconData.Optional % 10000000, beaconData.Optional / 10000000);
 		break;
 
