@@ -1113,14 +1113,17 @@ ATS_API void WINAPI SetBeaconData(ATS_BEACONDATA beaconData)
 	case 10: //ƒƒgƒTIS‰w–¼“Ç‚İ‚İ
 		g_9n.SetSESta(g_9n.ConvUsao2TIMS(beaconData.Optional));
 		break;
+	case 19: //•ûŒü”»’èEŒn“İ’è
+		g_9n.SetSEDirection(beaconData.Optional % 2, beaconData.Optional / 10);
+		break;
 	case 53: //‘–s‹——£
 		g_tims.SetPositionDef(beaconData.Optional / 10, beaconData.Optional % 10 == 0 ? -1 : 1);
 		break;
 	case 70: //¬“c‹}TIS‰w–¼Š„‚è‚İ
 		g_9n.SetSESta(beaconData.Optional / 100);
 		break;
-	case 89: //•ûŒü”»’èEŒn“İ’èi‰º‚è31`]ƒm“‡üA51`‘½–€üAã‚è51`Vhs‚«j
-		g_9n.SetSEDirection(beaconData.Optional % 2, beaconData.Optional);
+	case 89: //•ûŒü”»’èEŒn“İ’è
+		g_9n.SetSEDirection(beaconData.Optional % 2, -1);
 		break;
 	case 604: //‰w–¼“Ç‚İ‚İ
 		g_9n.SetSESta(beaconData.Optional);

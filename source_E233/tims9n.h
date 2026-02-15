@@ -8,11 +8,12 @@ class tims9N
 {
 public:
 	int McKey; //マスコンキー
+	int Company;	//走行社局（JR:1,地下鉄:4,小田急:7）
 	int TrainType; //種別
 	int m_DepartSta; //乗車駅変換前
 	int DepartSta; //乗車駅
 	int ArrivalSta; //降車駅
-	int SEArea; //社線用走行方面
+	int SEArea; //系統（ｼｸ多:5、ｼｸ江:4、ｼｸ小:3、M多:2、M江:1、M小:0）
 	//int m_Location; //自駅距離程
 	//int Location; //次駅距離程
 	int Array;
@@ -31,6 +32,7 @@ public:
 		//m_Location = 0;
 		//Location = 0;
 		m_DepartSta = -1;
+		Company = 7;
 
 		m_dist = 0;
 		m_array = 0;
@@ -247,9 +249,12 @@ public:
 		m_tisFlag = 1;
 	}
 
-	void SetSEDirection(int data, int area)
+	//進行方向（上り・下りを設定）キロ程増加方向と対応
+	void SetSEDirection(int data, int comp)
 	{
-		SEDirection = data == 0 ? -1 : 1; //上り列車では減算
+		m_seDirection = data == 0 ? -1 : 1; //上り列車では減算
+		if (comp > 0)
+			m_company = comp;
 		/*
 		if (area >= 51)
 			SEArea = 1;//下り多摩線・上り新宿行き
@@ -264,7 +269,8 @@ public:
 	void SetArrivalSta(int ats172)
 	{
 		ArrivalSta = ats172;
-		if (McKey == 7)
+		//if (McKey == 7)
+		if (Company == 7)
 		{
 			//小田急キーでメトロ以遠の行先の際は代々木上原降車
 			if ((ats172 >= 15 && ats172 <= 19) || (ats172 >= 42 && ats172 <= 48) || ats172 == 50 || ats172 == 51 || ats172 == 57)
@@ -272,7 +278,8 @@ public:
 				ArrivalSta = 41;
 			}
 		}
-		if (McKey == 1)
+		//if (McKey == 1)
+		if(Company == 4)
 		{
 			//メトロキーで小田急の行先の際は代々木上原降車
 			if ((ats172 >= 1 && ats172 <= 8) || (ats172 >= 10 && ats172 <= 14) || (ats172 >= 21 && ats172 <= 35))
@@ -285,6 +292,7 @@ public:
 				ArrivalSta = 42;
 			}
 		}
+
 		if (ats172 == 21)//新宿行きは1
 			SEArea = 1;
 		else if (ats172 == 24)//唐木田行きは3
@@ -299,7 +307,8 @@ public:
 	void SetDepartSta()
 	{
 		DepartSta = ConvSta2Dest(m_DepartSta);
-		if (McKey == 7)
+		//if (McKey == 7)
+		if (Company == 7)
 		{
 			//小田急キーでメトロ以遠の始発駅の場合は代々木上原乗車
 			if ((DepartSta >= 15 && DepartSta <= 19) || (DepartSta >= 42 && DepartSta <= 48) || DepartSta == 50 || DepartSta == 51 || DepartSta == 57)
@@ -307,7 +316,8 @@ public:
 				DepartSta = 41;
 			}
 		}
-		if (McKey == 1)
+		//if (McKey == 1)
+		if (Company == 4)
 		{
 			//メトロキーで小田急の行先の際は代々木上原降車
 			if ((DepartSta >= 1 && DepartSta <= 8) || (DepartSta >= 10 && DepartSta <= 14) || (DepartSta >= 21 && DepartSta <= 35))
@@ -320,34 +330,35 @@ public:
 				DepartSta = 42;
 			}
 		}
-		if (ConvSta2Dest(m_DepartSta) == 21)//新宿始発は1
+
+		if (ConvSta2Dest(m_DepartSta) == 21)//新宿始発
 		{
-			if (SEArea == 2 || SEArea == 3)
+			if (SEArea == 2 || SEArea == 3)//多摩線・江ノ島線行きは+3
 				SEArea += 2;//4or5
-			else
+			else//小田原線行きは3
 				SEArea = 3;
 		}
-		else if (ConvSta2Dest(m_DepartSta) == 24)//唐木田始発は3
+		else if (ConvSta2Dest(m_DepartSta) == 24)//唐木田始発
 		{
-			if (SEArea == 1)
+			if (SEArea == 1)//新宿行きは5
 				SEArea = 5;
-			else
+			else//メトロ行きは2
 				SEArea = 2;
 		}
-		else if (ConvSta2Dest(m_DepartSta) == 14 || ConvSta2Dest(m_DepartSta) == 4 || ConvSta2Dest(m_DepartSta) == 5 || ConvSta2Dest(m_DepartSta) == 27 || ConvSta2Dest(m_DepartSta) == 28 || ConvSta2Dest(m_DepartSta) == 35)//大和・藤沢・江ノ島・長後始発は2
+		else if (ConvSta2Dest(m_DepartSta) == 14 || ConvSta2Dest(m_DepartSta) == 4 || ConvSta2Dest(m_DepartSta) == 5 || ConvSta2Dest(m_DepartSta) == 27 || ConvSta2Dest(m_DepartSta) == 28 || ConvSta2Dest(m_DepartSta) == 35)//大和・藤沢・江ノ島・長後始発
 		{
-			if (SEArea == 1)
+			if (SEArea == 1)//新宿行きは4
 				SEArea = 4;
-			else
+			else//メトロ行きは1
 				SEArea = 1;
 		}
-		else//他は0
+		else//他（メトロ始発、小田原線始発）
 		{
-			if (SEArea == 2 || SEArea == 3)
+			if (SEArea == 2 || SEArea == 3)//多摩線・江ノ島線行きは-1
 				SEArea -= 1;//1or2
-			else if (SEArea == 1)
+			else if (SEArea == 1)//新宿行きは3
 				SEArea = 3;
-			else
+			else//他は0
 				SEArea = 0;
 		}
 
@@ -821,6 +832,9 @@ private:
 	int m_tisFlag; //TIS表示更新のフラグ
 	int m_seSta; //社線用駅名ストック
 
+	int m_seDirection; //走行方向ストック
+	int m_company;	//社局ストック
+
 	int m_tmrVisible; //モニタのステップ更新
 	int m_update[7]; //ステップ更新の状態
 	int m_option; //次駅と採時駅のみ更新
@@ -828,6 +842,8 @@ private:
 	//社線用駅名を更新
 	void PushSESta(void)
 	{
+		Company = m_company;	//メモリー更新
+		SEDirection = m_seDirection;	//メモリー更新
 		SESta[0] = m_seSta;
 	}
 };
