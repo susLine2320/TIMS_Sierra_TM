@@ -7,7 +7,8 @@
 class tims9N
 {
 public:
-	int McKey; //マスコンキー
+	int McKey; //TIMS表示基準マスコンキー
+	int McKeyLoc; //在線判断用マスコンキー
 	int Company;	//走行社局（JR:1,地下鉄:4,小田急:7）
 	int TrainType; //種別
 	int FromSta;	//列車始発駅
@@ -131,22 +132,23 @@ public:
 			}
 		}
 
+		// 停車予告ついてる&次の駅名が設定されてる&所定キロ程走行またはドア開扉で更新（通過停車で分けない）
 		if (m_pushUpFlag == 2 && m_tisFlag == 1 && ((g_speed != 0 && m_array <= 0) || !g_pilotLamp))
 		{
 			m_pushUpFlag = 0;
 			m_array = 0;
 
-			PushSESta();
+			PushSESta(0);
 		}
 		//以後駅ジャンプ
 		else if (m_pushUpFlag == 3 || m_pushUpBeacon == 2)
 		{
 			m_pushUpFlag = 0;
-			PushSESta();
+			PushSESta(1);
 		}
 		else if (m_pushUpFlag == -1) //起動時の初期化
 		{
-			PushSESta();
+			PushSESta(1);
 		}
 		Debug[0] = m_seSta;
 # if 0
@@ -269,12 +271,35 @@ public:
 			*/
 	}
 
+	// 社局の設定（毎フレーム）
+	void SetCompany()
+	{
+		int beforeMode = m_currentMode;
+		if (McKeyLoc == 0)
+		{
+			m_currentMode = Company;
+		}
+		else
+		{
+			if (McKeyLoc == 1 && Company == 4)
+				m_currentMode = 4;
+			else if (McKeyLoc == 6 && Company == 1)
+				m_currentMode = 1;
+			else if (McKeyLoc == 7 && Company == 7)
+				m_currentMode = 7;
+		}
+		McKey = m_currentMode == 1 ? 6 : m_currentMode == 4 ? 1 : m_currentMode;
+		if (beforeMode != m_currentMode) { PushSESta(1); }
+	}
+
+
 	//毎フレーム実行降車駅
 	void SetArrivalSta(int ats172)
 	{
 		ArrivalSta = DestinationSta;
-		//if (McKey == 7)
-		if (Company == 7)
+		//if (McKeyLoc == 7)
+		//if (Company == 7)
+		if (m_currentMode == 7)
 		{
 			//小田急キーでメトロ以遠の行先の際は代々木上原降車
 			if ((ArrivalSta >= 15 && ArrivalSta <= 19) || (ArrivalSta >= 42 && ArrivalSta <= 48) || ArrivalSta == 50 || ArrivalSta == 51 || ArrivalSta == 57)
@@ -282,8 +307,10 @@ public:
 				ArrivalSta = 41;
 			}
 		}
-		//if (McKey == 1)
-		if(Company == 4)
+		//メトロキーかつ（メトロキーできた場合または現在社局メトロ）または（現在社局メトロで初期化直後）
+		//if ((McKeyLoc == 1)
+		//if(Company == 4)
+		if (m_currentMode == 4)
 		{
 			//メトロキーで小田急の行先の際は代々木上原降車
 			if ((ArrivalSta >= 1 && ArrivalSta <= 8) || (ArrivalSta >= 10 && ArrivalSta <= 14) || (ArrivalSta >= 21 && ArrivalSta <= 35))
@@ -296,7 +323,9 @@ public:
 				ArrivalSta = 42;
 			}
 		}
-		if (Company == 1)
+		//if (McKeyLoc == 6)
+		//if (Company == 1)
+		if (m_currentMode == 1)
 		{
 			//JRキーでメトロ以遠の行先の際は綾瀬降車
 			if ((ArrivalSta >= 1 && ArrivalSta <= 14) || (ArrivalSta >= 42 && ArrivalSta <= 48) || ArrivalSta == 50 || ArrivalSta == 51 || ArrivalSta == 57 || (ArrivalSta >= 21 && ArrivalSta <= 35))
@@ -319,8 +348,10 @@ public:
 	void SetDepartSta()
 	{
 		DepartSta = FromSta;
-		//if (McKey == 7)
-		if (Company == 7)
+		//小田急キーかつ（小田急キーできた場合または現在社局小田急）または（現在社局小田急で（初期化直後または））
+		//if (McKeyLoc == 7)
+		//if (Company == 7)
+		if (m_currentMode == 7)
 		{
 			//小田急キーでメトロ以遠の始発駅の場合は代々木上原乗車
 			if ((DepartSta >= 15 && DepartSta <= 19) || (DepartSta >= 42 && DepartSta <= 48) || DepartSta == 50 || DepartSta == 51 || DepartSta == 57)
@@ -328,8 +359,10 @@ public:
 				DepartSta = 41;
 			}
 		}
-		//if (McKey == 1)
-		if (Company == 4)
+		//メトロキーかつ（メトロキーできた場合または現在社局メトロ）または（現在社局メトロで初期化直後）
+		//if (McKeyLoc == 1)
+		//if (Company == 4)
+		if (m_currentMode == 4)
 		{
 			//メトロキーで小田急の行先の際は代々木上原降車
 			if ((DepartSta >= 1 && DepartSta <= 8) || (DepartSta >= 10 && DepartSta <= 14) || (DepartSta >= 21 && DepartSta <= 35))
@@ -342,7 +375,9 @@ public:
 				DepartSta = 42;
 			}
 		}
-		if (Company == 1)
+		//if (Company == 1)
+		//if(McKeyLoc == 6)
+		if (m_currentMode == 1)
 		{
 			//JRキーでメトロ以遠の行先の際は綾瀬降車
 			if ((DepartSta >= 1 && DepartSta <= 14) || (DepartSta >= 42 && DepartSta <= 48) || DepartSta == 50 || DepartSta == 51 || DepartSta == 57 || (DepartSta >= 21 && DepartSta <= 35))
@@ -441,7 +476,7 @@ public:
 			break;
 			*/
 		case 95: //綾瀬
-			sta1 = Company == 1 ? 14 : 96;
+			sta1 = m_currentMode == 1 ? 14 : 96;
 			break;
 		case 119: //代々木公園
 			sta1 = 31;
@@ -876,7 +911,7 @@ public:
 			m_array2 = loc;
 			m_pushUpFlag = 1;
 			//まだ更新できてなかった時用
-			PushSESta();
+			PushSESta(0);
 		}
 	}
 
@@ -914,13 +949,21 @@ private:
 	int m_update[7]; //ステップ更新の状態
 	int m_option; //次駅と採時駅のみ更新
 
+	int m_mcKey; //前フレームのキー
+	int m_currentMode;
+
 	//社線用駅名を更新
-	void PushSESta(void)
+	void PushSESta(int id)
 	{
+		SESta[0] = m_seSta;
+		if (id == 0 && Company != m_company)//会社切替駅の場合、切り替え時に処理を行います
+		{
+			Company = m_company;	//メモリー更新
+			return;
+		}
 		Company = m_company;	//メモリー更新
 		SEDirection = m_seDirection;	//メモリー更新
 		DestinationSta = m_seDestination;	//メモリー更新
 		FromSta = m_seFrom;	//メモリー更新
-		SESta[0] = m_seSta;
 	}
 };

@@ -109,8 +109,9 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 	g_meter.Current = vehicleState.Current;
 	g_sub.BcPressure = vehicleState.BcPressure;
 
-	g_9n.McKey = panel[160] == 5 ? 6 : panel[160];
+	g_9n.McKeyLoc = panel[160] == 5 ? 6 : panel[160];
 	g_9n.TrainType = panel[152];
+	g_9n.SetCompany();
 	g_9n.SetArrivalSta(panel[172]);
 	g_9n.SetDepartSta();
 
@@ -299,6 +300,7 @@ ATS_API ATS_HANDLES WINAPI Elapse(ATS_VEHICLESTATE vehicleState, int *panel, int
 			panel[399] = g_9n.McKey != 6 ? 0 : g_tims.For; //列車行先
 			//panel[209] = g_tims.This; //自駅（TIS用）
 			//panel[210] = g_tims.Next; //次駅
+			panel[400] = g_9n.McKey; //TIMSモード
 
 			// スタフテーブル
 			//電列共通
